@@ -15,7 +15,7 @@ public class Main {
         productsList.add(new Product("Airpods Pro", 350000, "노이즈 캔슬링 무선 이어폰", 0));
 
         System.out.println("[ 실시간 커머스 플랫폼 - 전자제품 ]");
-        CommerceSystem system = new CommerceSystem(productsList);
+        CommerceSystem system = new CommerceSystem(productsList); // 리스트 전달
         system.start();
 
         }

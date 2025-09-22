@@ -13,7 +13,7 @@ public class CommerceSystem {
     Scanner sc = new Scanner(System.in); // 입력 처리는 CommerceSystem.java에서 진행될 수 있도록 함
 
     // 생성자
-    public CommerceSystem(List<Product> productList) {
+    public CommerceSystem(List<Product> productList) { //클래스 생성자를 통해 값을 할당
         this.productList = productList;
     }
 
