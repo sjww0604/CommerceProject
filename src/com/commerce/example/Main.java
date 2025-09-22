@@ -7,6 +7,7 @@ public class Main {
     public static void main(String[] args) {
         // 속성
         List<Product> productsList = new ArrayList<>();
+        List<Category> categoryList;
 
         // 생성자
         productsList.add(new Product("Galaxy S25", 1200000, "최신 안드로이드 스마트폰", 0));
@@ -15,8 +16,8 @@ public class Main {
         productsList.add(new Product("Airpods Pro", 350000, "노이즈 캔슬링 무선 이어폰", 0));
 
         System.out.println("[ 실시간 커머스 플랫폼 - 전자제품 ]");
-        CommerceSystem system = new CommerceSystem(productsList); // 리스트 전달
-        system.start();
-
-        }
+        Category category = new Category(productsList); // 리스트 전달
+        CommerceSystem commerceSystem = new CommerceSystem(category);
+        commerceSystem.start();
     }
+}

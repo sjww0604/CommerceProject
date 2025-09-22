@@ -2,7 +2,7 @@
 JAVA 문법 종합반 커머스 과제 레포지토리입니다.<br>
 
 ## 사용된 기술 및 실행환경
-<img src="https://img.shields.io/badge/java-007396?style=for-the-badge&logo=java&logoColor=white">
+<img src="https://img.shields.io/badge/java-007396?style=for-the-badge&logo=java&logoColor=white" alt="">
 
 ## 과제의 목표
 - 계산기 과제 개념의 확장 버전으로, 여러 객체가 협력하는 객체 지향 설계 구조를 커머스 플랫폼에 적용해보는 경험 얻기
