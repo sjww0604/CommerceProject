@@ -95,9 +95,16 @@ public class CommerceSystem {
                 String addCheck = String.format("%-10s %-15s","1. 확인","2. 취소");
                 System.out.println(addCheck);
                 int actionChoice = sc.nextInt();
-                if (actionChoice == 1) {
-                    addCart(product);
-                } continue;
+                switch (actionChoice) {
+                    case 1:
+                        addCart(product);
+                        break;
+                    case 2:
+                        continue; // 카테고리 화면으로 돌아가기
+                    default:
+                        System.out.println("올바른 숫자를 입력하세요!");
+                        continue; // 잘못 입력 → 다시 카테고리 루프 반복
+                }
             } else {
                 System.out.println("올바른 숫자를 입력하세요! ");
             }
@@ -107,6 +114,7 @@ public class CommerceSystem {
     // 장바구니 추가 기능
     private void addCart(Product product) {
         cart.add(product);
+        System.out.println("=======================================");
         String addCartItem = String.format(" %s 가 장바구니에 추가되었습니다.", product.getPdName());
         System.out.println(addCartItem);
     }
