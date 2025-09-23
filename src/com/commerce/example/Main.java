@@ -5,19 +5,37 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        // 속성
-        List<Product> productsList = new ArrayList<>();
-        List<Category> categoryList;
+        // 속성 : 각 카테고리별 상품 리스트에 추가 및 객체 전달
+        // 전자제품
+        Category electronics = new Category("전자제품");
+        electronics.addProduct(new Product("Galaxy S25", 1200000, "최신 안드로이드 스마트폰", 30));
+        electronics.addProduct(new Product("iPhone 16", 1350000, "Apple의 최신 스마트폰", 25));
+        electronics.addProduct(new Product("MacBook Pro", 2400000, "M3 칩셋 노트북", 12));
+        electronics.addProduct(new Product("AirPods Pro", 350000, "노이즈 캔슬링 무선 이어폰", 50));
 
-        // 생성자
-        productsList.add(new Product("Galaxy S25", 1200000, "최신 안드로이드 스마트폰", 0));
-        productsList.add(new Product("iPhone 16", 1350000, "Apple의 최신 스마트폰", 0));
-        productsList.add(new Product("MackBook Pro", 2400000, "M3 칩셋이 탑재된 노트북", 0));
-        productsList.add(new Product("Airpods Pro", 350000, "노이즈 캔슬링 무선 이어폰", 0));
+        // 의류
+        Category clothes = new Category("의류");
+        clothes.addProduct(new Product("Red T-Shirt", 15000, "빨간 반팔티", 120));
+        clothes.addProduct(new Product("Black Jean", 30000, "까만 청바지", 42));
+        clothes.addProduct(new Product("White Socks", 3000, "흰 양말", 500));
+        clothes.addProduct(new Product("Gray Cap", 25000, "회색 모자", 60));
 
-        System.out.println("[ 실시간 커머스 플랫폼 - 전자제품 ]");
-        Category category = new Category(productsList); // 리스트 전달
-        CommerceSystem commerceSystem = new CommerceSystem(category);
-        commerceSystem.start();
+        // 식품
+        Category foods = new Category("식품");
+        foods.addProduct(new Product("Chocolate Bar", 2000, "달콤한 초콜릿", 300));
+        foods.addProduct(new Product("Milk 1L", 2500, "신선한 우유", 80));
+        foods.addProduct(new Product("3minutes Curry", 2000, "3분 카레", 50));
+        foods.addProduct(new Product("Ice Americano 1L", 4000, "아아 1리터", 10));
+
+        // 가구
+        Category furniture = new Category("가구");
+        furniture.addProduct(new Product("Desk", 120000, "원목 책상", 10));
+        furniture.addProduct(new Product("Chair", 60000, "인체공학 의자", 25));
+        furniture.addProduct(new Product("Bed", 700000, "푹신한 침대", 20));
+        furniture.addProduct(new Product("Sofa", 550000, "소파", 5));
+
+        // CommerceSystem 객체 생성(카테고리 주입) 및 프로그램 실행(start 루프)
+        CommerceSystem system = new CommerceSystem(electronics, clothes, foods, furniture);
+        system.start();
     }
 }
