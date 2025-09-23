@@ -20,32 +20,77 @@ public class CommerceSystem {
         this.furniture = furniture;
     }
 
-    // 기능
-    public void start() { // Main.java 에서 입력과 반복문 처리하는 기능을 이관
+    // 초기화면 기능 및 검증
+    public void start() {
         boolean mainStatus = true;
         while (mainStatus) {
-            category.printProducts(); // 배열 내 저장된 전체 리스트 출력하는 출력 메서드 호출
-            System.out.println("0. 종료 | 프로그램 종료");
-            int choice = sc.nextInt();
+            displayMainMenu(); // 프로그램 초기화면 구성
+            int categoryChoice = sc.nextInt();
 
-            if (choice == 0) {
-                mainStatus = false;
-                System.out.println("커머스 플랫폼을 종료합니다.");
-            } else if (choice >= 1 && choice < category.size() + 1) { //배열의 크기는 입력된 개수의 -1개이므로 저장된 배열값 끝까지 조회하기 위해 +1로 조건문 설정
-                Product product = category.getProduct(choice - 1); // Category에서 Product를 관리하므로 getter 선언
-                /* String.format을 활용한 자릿수 및 단위 표현 기능 추가
-                 * %-15s : 고정폭 15만큼 설정, 왼쪽 정렬로 나타냄
-                 * %,10d : 고정폭 10만큼 설정, 자릿수 , 표현 및 원 단위 붙이기 (Decimal 십진수의 글자를 딴 표현형태)
-                 * %s : 문자형(String)으로 표현*/
-                String productResultList = String.format("%d. %-15s | %,10d원 | %s", choice, product.getPdName(), product.getPdPrice(), product.getPdDescription());
-                // 출력 양식을 준수하되 입력값에 따라 저장되어있는 배열 한줄만 나타내기 위해 사용
+            switch (categoryChoice) {
+                case 0:
+                    mainStatus = false;
+                    System.out.println("커머스 플랫폼을 종료합니다.");
+                    break;
+                case 1:
+                    browseCategory(electronics);
+                    break;
+                case 2:
+                    browseCategory(clothes);
+                    break;
+                case 3:
+                    browseCategory(foods);
+                    break;
+                case 4:
+                    browseCategory(furniture);
+                    break;
+                default:
+                    System.out.println("올바른 숫자를 입력하세요!");
+                    continue; // 메인 메뉴로 복귀
+                    //화면: 카테고리 내부(상품 목록 및 상품 상세)
+            }
+        }
+    }
+
+    // 메인 메뉴 화면 출력
+    private void displayMainMenu() {
+        System.out.println("[ 실시간 커머스 플랫폼 메인 ]");
+        System.out.println("1. " + electronics.getCategoryName());
+        System.out.println("2. " + clothes.getCategoryName());
+        System.out.println("3. " + foods.getCategoryName());
+        System.out.println("4. " + furniture.getCategoryName());
+        System.out.println("0. 종료 | 프로그램 종료");
+
+    }
+
+    //화면: 카테고리 내부(상품 목록 및 상품 상세)
+    private void browseCategory (Category category){
+        boolean subStatus = true;
+        while (subStatus) {
+            System.out.println();
+            String catTitle = String.format("[ %s 카테고리 ]", category.getCategoryName());
+            System.out.println(catTitle);
+            category.printProducts(); // 전체 리스트 출력
+            System.out.println("0. 뒤로가기 ");
+
+
+            int productChoice = sc.nextInt();
+            if (productChoice == 0) {
+                subStatus = false; // 뒤로가기
+            } else if (productChoice >= 1 && productChoice <= category.size()) {
+                Product product = category.getProduct(productChoice - 1);
+                String productResultList = String.format(
+                        "%d. %-15s | %,10d원 | %s | %d개",
+                        productChoice,
+                        product.getPdName(),
+                        product.getPdPrice(),
+                        product.getPdDescription(),
+                        product.getPdStock()
+                );
                 System.out.println(productResultList);
-                System.out.println("========================================================"); // 1~4번 한줄씩 출력될 때 구분되지 않아 구분선 추가
-                System.out.println();
-
+                System.out.println("========================================================");
             } else {
                 System.out.println("올바른 숫자를 입력하세요! ");
-                return; // 배열에 저장된 값 번호를 올바르게 입력하지 않으면 프로그램 종료
             }
         }
     }
