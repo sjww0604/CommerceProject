@@ -21,6 +21,10 @@ public class Product {
         this.pdStock = pdStock;
     }
 
+    public void setPdStock(int pdStock) { // 주문 이후 재고수량 변경을 위한 세터 설정
+        this.pdStock = pdStock;
+    }
+
     // 기능 : 게터 기능을 사용하여 생성된 객체에 저장된 값들을 읽을 수 있도록 반환
     public String getPdName() {
         return pdName;
