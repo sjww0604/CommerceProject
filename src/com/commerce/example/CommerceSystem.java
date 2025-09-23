@@ -144,12 +144,14 @@ public class CommerceSystem {
     // 장바구니 출력 기능
     private void showCart() {
         System.out.println("아래와 같이 주문 하시겠습니까? ");
-        for (Product product : cart) {
+        for (int i =0; i < cart.size(); i++) {
+            Product product = cart.get(i);
+            int cartStock = cartCounts.get(i); // 장바구니에 담긴 수량
             String cartList = String.format("%-13s | %,10d원 | %s | 수량: %d개",
                     product.getPdName(),
                     product.getPdPrice(),
                     product.getPdDescription(),
-                    product.getPdStock()
+                    cartStock
             );
             System.out.println(cartList);
         }
@@ -162,8 +164,10 @@ public class CommerceSystem {
     // 총 금액 계산 전용 기능 (외부 선언 및 호출 가능하도록 수정)
     private int getCartTotalPrice() {
         int totalPrice = 0;
-        for (Product product : cart) {
-            totalPrice += product.getPdPrice();
+        for (int i=0; i< cart.size(); i++) {
+            Product product = cart.get(i);
+            int cartStock = cartCounts.get(i);
+            totalPrice += product.getPdPrice() * cartStock; // 장바구니 상품 * 장바구니에 담긴 상품의 수량을 곱한 값을 총합으로 합침
         }
         return totalPrice;
     }
