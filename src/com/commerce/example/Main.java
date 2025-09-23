@@ -15,14 +15,14 @@ public class Main {
 
         // 의류
         Category clothes = new Category("의류");
-        clothes.addProduct(new Product("Red T-Shirt", 15000, "빨간 반팔티", 120));
+        clothes.addProduct(new Product("Red T-Shirt", 15000, "빨간 반팔티", 5));
         clothes.addProduct(new Product("Black Jean", 30000, "까만 청바지", 42));
-        clothes.addProduct(new Product("White Socks", 3000, "흰 양말", 500));
+        clothes.addProduct(new Product("White Socks", 3000, "흰 양말", 10));
         clothes.addProduct(new Product("Gray Cap", 25000, "회색 모자", 60));
 
         // 식품
         Category foods = new Category("식품");
-        foods.addProduct(new Product("Chocolate Bar", 2000, "달콤한 초콜릿", 300));
+        foods.addProduct(new Product("Chocolate Bar", 2000, "달콤한 초콜릿", 30));
         foods.addProduct(new Product("Milk 1L", 2500, "신선한 우유", 80));
         foods.addProduct(new Product("3minutes Curry", 2000, "3분 카레", 50));
         foods.addProduct(new Product("Ice Americano 1L", 4000, "아아 1리터", 10));

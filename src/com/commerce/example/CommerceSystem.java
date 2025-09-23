@@ -155,7 +155,7 @@ public class CommerceSystem {
             );
             System.out.println(cartList);
         }
-            String total = String.format("%,10d원",getCartTotalPrice()); // 장바구니에 담긴 상품의 총 가격을 출력
+            String total = String.format("%,d원",getCartTotalPrice()); // 장바구니에 담긴 상품의 총 가격을 출력
             System.out.println();
             System.out.println("[ 총 주문 금액 ]");
             System.out.println(total);
@@ -172,15 +172,37 @@ public class CommerceSystem {
         return totalPrice;
     }
 
-
     // 주문 기능
     private void order() {
         String orderCheck = String.format("%-10s %-15s","1. 주문 확정","2. 메인으로 돌아가기");
         System.out.println(orderCheck);
         int orderChoice = sc.nextInt();
         if (orderChoice == 1) {
-            String orderTotal = String.format("%,10d원",getCartTotalPrice());
+            String orderTotal = String.format("%,d원",getCartTotalPrice());
             System.out.println("주문이 완료되었습니다! 총 금액 : " + orderTotal);
+
+            // 장바구니의 주문수량만큼 재고 차감
+            for (int i = 0; i < cart.size(); i++) {
+                Product product = cart.get(i);
+                int cartStock = cartCounts.get(i);
+
+                int beforeStock = product.getPdStock();
+                int afterStock = beforeStock - cartStock;
+                product.setPdStock(afterStock);
+
+                String stockStatus = String.format("%s 재고가 %d개 → %d개로 업데이트 되었습니다.",
+                        product.getPdName(),
+                        beforeStock,
+                        afterStock
+                );
+                System.out.println(stockStatus);
+            }
+            System.out.println();
+
+            // 주문 처리 이후 장바구니 비우기
+            cart.clear();
+            cartCounts.clear();
+
         } else if (orderChoice == 2) {
             start(); //
         } else {
