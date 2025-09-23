@@ -1,5 +1,6 @@
 package com.commerce.example;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -11,6 +12,9 @@ public class CommerceSystem {
     private final Category foods;
     private final Category furniture;
     private final Scanner sc = new Scanner(System.in); // 입력 담당
+
+    /* 장바구니 필드 추가 */
+    private final List<Product> cart = new ArrayList<>();
 
     // 생성자
     public CommerceSystem(Category electronics, Category clothes, Category foods, Category furniture) {
@@ -73,7 +77,6 @@ public class CommerceSystem {
             category.printProducts(); // 전체 리스트 출력
             System.out.println("0. 뒤로가기 ");
 
-
             int productChoice = sc.nextInt();
             if (productChoice == 0) {
                 subStatus = false; // 뒤로가기
@@ -93,5 +96,12 @@ public class CommerceSystem {
                 System.out.println("올바른 숫자를 입력하세요! ");
             }
         }
+    }
+
+    // 장바구니 추가 기능
+    private void addCart(Product product) {
+        cart.add(product);
+        String addCartItem = String.format(" %s 가 장바구니에 추가되었습니다.", product.getPdName());
+        System.out.println(addCartItem);
     }
 }
