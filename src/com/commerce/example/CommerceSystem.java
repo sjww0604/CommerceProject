@@ -3,18 +3,21 @@ package com.commerce.example;
 import java.util.List;
 import java.util.Scanner;
 
-/* 프로그램 비즈니스 로직 클래스
-* 커머스 플랫폼의 상품을 관리하고 사용자 입력을 처리하는 클래스
-* Product를 관리하는 리스트가 필드로 존재
-* Main.java의 입력과 반복문 기능을 여기로 이관 */
+/* 프로그램 비즈니스 로직 클래스 */
 public class CommerceSystem {
-    // 속성
-    private final Category category; // Category에서 배열을 관리하므로 그에 따라 Category를 통해 배열을 불러옴
-    private final Scanner sc = new Scanner(System.in); // 입력 처리는 CommerceSystem.java에서 진행될 수 있도록 함
+    /* 속성 4개의 카테고리 속성 추가 */
+    private final Category electronics;
+    private final Category clothes;
+    private final Category foods;
+    private final Category furniture;
+    private final Scanner sc = new Scanner(System.in); // 입력 담당
 
     // 생성자
-    public CommerceSystem(Category category) { // Category 클래스를 통해 값을 받음
-        this.category = category;
+    public CommerceSystem(Category electronics, Category clothes, Category foods, Category furniture) {
+        this.electronics = electronics;
+        this.clothes = clothes;
+        this.foods = foods;
+        this.furniture = furniture;
     }
 
     // 기능
