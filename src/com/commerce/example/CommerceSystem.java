@@ -146,15 +146,23 @@ public class CommerceSystem {
                     product.getPdDescription(),
                     product.getPdStock()
             );
-            totalPrice += product.getPdPrice();
             System.out.println(cartList);
         }
-            String total = String.format("%,10d원",totalPrice); // 장바구니에 담긴 상품의 총 가격을 출력
+            String total = String.format("%,10d원",getCartTotalPrice()); // 장바구니에 담긴 상품의 총 가격을 출력
             System.out.println();
             System.out.println("[ 총 주문 금액 ]");
             System.out.println(total);
             System.out.println();
         }
+    // 총 금액 계산 전용 기능 (외부 선언 및 호출 가능하도록 수정)
+    private int getCartTotalPrice() {
+        int totalPrice = 0;
+        for (Product product : cart) {
+            totalPrice += product.getPdPrice();
+        }
+        return totalPrice;
+    }
+
 
     // 주문 기능
     private void order() {
@@ -162,9 +170,13 @@ public class CommerceSystem {
         System.out.println(orderCheck);
         int orderChoice = sc.nextInt();
         if (orderChoice == 1) {
-            System.out.print("주문이 완료되었습니다! 총 금액 : " ); // 총 금액을 showcart 내에서만 선언해서 불러와지지 않음..
+            String orderTotal = String.format("%,10d원",getCartTotalPrice());
+            System.out.println("주문이 완료되었습니다! 총 금액 : " + orderTotal);
+        } else if (orderChoice == 2) {
+            start(); //
         } else {
-            start();
+            System.out.println("올바른 숫자를 입력하세요!");
+            return;
         }
     }
 }
