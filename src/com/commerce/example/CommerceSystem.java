@@ -48,6 +48,9 @@ public class CommerceSystem {
                 case 4:
                     browseCategory(furniture);
                     break;
+                case 5:
+                    showCart();
+                    break;
                 default:
                     System.out.println("올바른 숫자를 입력하세요!");
                     continue; // 메인 메뉴로 복귀
@@ -63,8 +66,20 @@ public class CommerceSystem {
         System.out.println("2. " + clothes.getCategoryName());
         System.out.println("3. " + foods.getCategoryName());
         System.out.println("4. " + furniture.getCategoryName());
+        displayCartMenu();
         System.out.println("0. 종료 | 프로그램 종료");
 
+
+    }
+
+    // 장바구니 관련 메뉴 출력
+    private void displayCartMenu() {
+        if (!cart.isEmpty()) {
+            System.out.println();
+            System.out.println("[ 주문 관리 ]");
+            System.out.println("5. 장바구니 확인 | 장바구니를 확인 후 주문합니다.");
+            System.out.println("6. 주문 취소  | 진행중인 주문을 취소합니다. ");
+        }
     }
 
     //화면: 카테고리 내부(상품 목록 및 상품 상세)
@@ -117,5 +132,18 @@ public class CommerceSystem {
         System.out.println("=======================================");
         String addCartItem = String.format(" %s 가 장바구니에 추가되었습니다.", product.getPdName());
         System.out.println(addCartItem);
+    }
+
+    // 장바구니 출력 기능
+    private void showCart() {
+        for (Product product : cart) {
+            String cartList = String.format("%-13s | %,10d원 | %s | 수량: %d개",
+                    product.getPdName(),
+                    product.getPdPrice(),
+                    product.getPdDescription(),
+                    product.getPdStock()
+            );
+            System.out.println(cartList);
+        }
     }
 }
