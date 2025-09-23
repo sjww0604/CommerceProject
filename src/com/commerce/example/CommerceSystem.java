@@ -50,6 +50,7 @@ public class CommerceSystem {
                     break;
                 case 5:
                     showCart();
+                    order();
                     break;
                 default:
                     System.out.println("올바른 숫자를 입력하세요!");
@@ -154,4 +155,17 @@ public class CommerceSystem {
             System.out.println(total);
             System.out.println();
         }
+
+    // 주문 기능
+    private void order() {
+        String orderCheck = String.format("%-10s %-15s","1. 주문 확정","2. 메인으로 돌아가기");
+        System.out.println(orderCheck);
+        int orderChoice = sc.nextInt();
+        if (orderChoice == 1) {
+            System.out.print("주문이 완료되었습니다! 총 금액 : " ); // 총 금액을 showcart 내에서만 선언해서 불러와지지 않음..
+        } else {
+            start();
+        }
     }
+}
+
