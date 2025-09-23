@@ -11,14 +11,14 @@ public class Product {
     private String pdName;
     private int pdPrice;
     private String pdDescription;
-    public int pdQty;
+    public int pdStock;
 
     // 생성자 : 메서드 선언 시 전달된 매개변수를 this.필드에 저장
-    public Product(String pdName, int pdPrice, String pdDescription, int pdQty) {
+    public Product(String pdName, int pdPrice, String pdDescription, int pdStock) {
         this.pdName = pdName;
         this.pdPrice = pdPrice;
         this.pdDescription = pdDescription;
-        this.pdQty = pdQty;
+        this.pdStock = pdStock;
     }
 
     // 기능 : 게터 기능을 사용하여 생성된 객체에 저장된 값들을 읽을 수 있도록 반환
@@ -31,7 +31,7 @@ public class Product {
     public String getPdDescription() {
         return pdDescription;
     }
-    public int getPdQty() {
-        return pdQty;
+    public int getPdStock() {
+        return pdStock;
     }
 }
