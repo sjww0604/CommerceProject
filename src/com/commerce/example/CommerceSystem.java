@@ -128,6 +128,23 @@ public class CommerceSystem {
     // 장바구니 추가 기능
     private void addCart(Product product) {
         int index = cart.indexOf(product);
+        int currentStock; // 장바구니에 담는 수량이 보유재고수량보다 많을 때 경고문을 나타낼 수 있도록 검증기능 추가
+        if (index>= 0) {
+            currentStock = cartCounts.get(index);
+        } else {
+            currentStock = 0;
+        }
+        int stock = product.getPdStock();
+
+        if (currentStock >= stock) {
+            String alertStock = String.format("판매가능한 재고가 부족합니다. 현재 재고 %d개, 장바구니 수량 %d개",
+                    stock,
+                    currentStock
+            );
+            System.out.println(alertStock);
+            return;
+        }
+
         if (index >= 0) {
             //이미 담긴 상품이면 수량 증가
             cartCounts.set(index, cartCounts.get(index) + 1);
