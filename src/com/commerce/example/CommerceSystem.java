@@ -91,7 +91,13 @@ public class CommerceSystem {
                         product.getPdStock()
                 );
                 System.out.println(productResultList);
-                System.out.println("========================================================");
+                System.out.println("위 상품을 장바구니에 추가하시겠습니까?");
+                String addCheck = String.format("%-10s %-15s","1. 확인","2. 취소");
+                System.out.println(addCheck);
+                int actionChoice = sc.nextInt();
+                if (actionChoice == 1) {
+                    addCart(product);
+                } continue;
             } else {
                 System.out.println("올바른 숫자를 입력하세요! ");
             }
