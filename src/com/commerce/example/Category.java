@@ -5,20 +5,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 /* Product 클래스를 관리하는 클래스
-* 전자제품, 의류, 식품 등 각 카테고리 내에 여러 Product를 포함*/
+ * 전자제품, 의류, 식품 등 각 카테고리 내에 여러 Product를 포함*/
 public class Category {
     // 속성
+    private final String categoryName; // 카테고리별 이름 필드 설정
     private List<Product> productList; // product 관리 필드 (CommerceSystem -> Category 로 목적에 맞게 이동)
-    public Category(List<Product> productList) {
-        this.productList = productList;
-    }
 
 
     // 생성자
+    public Category(String categoryName) {
+        this.categoryName = categoryName;
+        this.productList = new ArrayList<>();
+    }
+    public String getCategoryName() {
+        return categoryName;
+    }
 
+    // 기능
+    public void addProduct(Product product) { // 상품 추가 기능
+        productList.add(product);
+    }
+    public Product getProduct(int index) { // 특정 번호에 맞는 상품 반환
+        return productList.get(index);
+    }
+    public int size() { // 사이즈 반환
+        return productList.size();
+    }
 
-
-    public void printProducts() {
+    public void printProducts() { // 전체 출력 기능
         for (int i = 0; i < productList.size(); i++) {
             Product product = productList.get(i);
             String formatted = String.format( // 출력 양식은 맞추되 저장되어있는 배열 전체 화면 출력을 위한 용도
@@ -30,15 +44,5 @@ public class Category {
             );
             System.out.println(formatted);
         }
-    }
-
-
-    // 기능
-    public Product getProduct(int index) {
-        return productList.get(index);
-    }
-
-    public int size() {
-        return productList.size();
     }
 }
