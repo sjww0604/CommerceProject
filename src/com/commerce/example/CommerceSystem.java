@@ -15,6 +15,7 @@ public class CommerceSystem {
 
     /* 장바구니 필드 추가 */
     private final List<Product> cart = new ArrayList<>();
+    private final List<Integer> cartCounts = new ArrayList<>(); // 장바구니에 상품별 담긴 수량 계산을 하기 위한 리스트 선언
 
     // 생성자
     public CommerceSystem(Category electronics, Category clothes, Category foods, Category furniture) {
@@ -59,7 +60,6 @@ public class CommerceSystem {
             }
         }
     }
-
     // 메인 메뉴 화면 출력
     private void displayMainMenu() {
         System.out.println("[ 실시간 커머스 플랫폼 메인 ]");
@@ -69,8 +69,6 @@ public class CommerceSystem {
         System.out.println("4. " + furniture.getCategoryName());
         displayCartMenu();
         System.out.println("0. 종료 | 프로그램 종료");
-
-
     }
 
     // 장바구니 관련 메뉴 출력
@@ -129,7 +127,15 @@ public class CommerceSystem {
 
     // 장바구니 추가 기능
     private void addCart(Product product) {
-        cart.add(product);
+        int index = cart.indexOf(product);
+        if (index >= 0) {
+            //이미 담긴 상품이면 수량 증가
+            cartCounts.set(index, cartCounts.get(index) + 1);
+        } else {
+            // 새 상품이면 리스트에 추가
+            cart.add(product);
+            cartCounts.add(1);
+        }
         System.out.println("=======================================");
         String addCartItem = String.format(" %s 가 장바구니에 추가되었습니다.", product.getPdName());
         System.out.println(addCartItem);
@@ -137,7 +143,6 @@ public class CommerceSystem {
 
     // 장바구니 출력 기능
     private void showCart() {
-        int totalPrice = 0; // 총 금액을 담을 변수 선언
         System.out.println("아래와 같이 주문 하시겠습니까? ");
         for (Product product : cart) {
             String cartList = String.format("%-13s | %,10d원 | %s | 수량: %d개",
