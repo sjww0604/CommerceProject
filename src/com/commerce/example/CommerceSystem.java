@@ -147,10 +147,11 @@ public class CommerceSystem {
             );
             totalPrice += product.getPdPrice();
             System.out.println(cartList);
-            System.out.println();
         }
             String total = String.format("%,10d원",totalPrice); // 장바구니에 담긴 상품의 총 가격을 출력
-            System.out.println("[총 주문 금액 ]");
+            System.out.println();
+            System.out.println("[ 총 주문 금액 ]");
             System.out.println(total);
+            System.out.println();
         }
     }
