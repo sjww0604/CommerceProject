@@ -136,6 +136,8 @@ public class CommerceSystem {
 
     // 장바구니 출력 기능
     private void showCart() {
+        int totalPrice = 0; // 총 금액을 담을 변수 선언
+        System.out.println("아래와 같이 주문 하시겠습니까? ");
         for (Product product : cart) {
             String cartList = String.format("%-13s | %,10d원 | %s | 수량: %d개",
                     product.getPdName(),
@@ -143,7 +145,12 @@ public class CommerceSystem {
                     product.getPdDescription(),
                     product.getPdStock()
             );
+            totalPrice += product.getPdPrice();
             System.out.println(cartList);
+            System.out.println();
+        }
+            String total = String.format("%,10d원",totalPrice); // 장바구니에 담긴 상품의 총 가격을 출력
+            System.out.println("[총 주문 금액 ]");
+            System.out.println(total);
         }
     }
-}
