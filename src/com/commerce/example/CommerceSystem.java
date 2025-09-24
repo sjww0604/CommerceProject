@@ -24,32 +24,43 @@ public class CommerceSystem {
         while (mainStatus) {
             displayMainMenu(); // 프로그램 초기화면 구성
             int categoryChoice = sc.nextInt();
+            int categorySize = categories.size();
+            int cartMenu = -1;
+            int cancelMenu = -1;
+            int adminMenu;
+            if (cart.isEmpty()) {
+                adminMenu = categorySize + 1; // 장바구니가 비었을 때 카테고리 다음 순번이 관리자 모드가 나오도록 번호 저장
+            } else {
+                /* 장바구니가 있을 때 구현되어야 할 순번에 맞춰 값을 저장 */
+                cartMenu = categorySize + 1;  // 장바구니 확인
+                cancelMenu = categorySize + 2; // 주문 취소
+                adminMenu = categorySize + 3; // 관리자 모드
+            }
 
             if (categoryChoice == 0) {
                 mainStatus = false;
                 System.out.println("커머스 플랫폼을 종료합니다.");
                 continue;
             }
-            int categorySize = categories.size(); // 카테고리 개수
-            int cartMenu = categorySize + 1; // 장바구니 확인
-            int cancelMenu = categorySize + 2; // 주문 취소
-
             if (categoryChoice >= 1 && categoryChoice <= categorySize) {
                 Category selectedCategory = categories.get(categoryChoice - 1);
                 browseCategory(selectedCategory);
-            } else if (categoryChoice == cartMenu) {
+            } else if (cartMenu != -1 && categoryChoice == cartMenu) {
                 showCart();
                 order();
-            } else if (categoryChoice == cancelMenu) {
+            } else if (cancelMenu != -1 && categoryChoice == cancelMenu) {
                 System.out.println("주문을 취소했습니다.");
                 cart.clear();
                 System.out.println();
                 continue;
+            } else if (categoryChoice == adminMenu) {
+                System.out.println("[공사중] 관리자 모드");
             } else {
                 System.out.println("올바른 숫자를 입력하세요!");
             }
         }
     }
+
 
     // 메인 메뉴 화면 출력 categories 리스트 내 정보를 모두 나타냄
     private void displayMainMenu() {
@@ -59,6 +70,7 @@ public class CommerceSystem {
             System.out.println((i + 1) +". " + category.getCategoryName());
         }
         displayCartMenu();
+        displayAdminMenu();
         System.out.println("0. 종료 | 프로그램 종료");
     }
 
@@ -73,6 +85,13 @@ public class CommerceSystem {
             System.out.println(cartMenu + ". 장바구니 확인 | 장바구니를 확인 후 주문합니다.");
             System.out.println(cancelMenu + ". 주문 취소  | 진행중인 주문을 취소합니다. ");
         }
+    }
+
+    // 관리자 모드 메뉴 출력
+    private void displayAdminMenu() {
+        int base = categories.size();
+        int adminMenu = cart.isEmpty() ? (base + 1) : (base + 3); // 장바구니가 비었을 땐
+            System.out.println(adminMenu + ". 관리자 모드");
     }
 
     //화면: 카테고리 내부(상품 목록 및 상품 상세)
