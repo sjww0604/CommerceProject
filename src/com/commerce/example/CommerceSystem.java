@@ -43,7 +43,8 @@ public class CommerceSystem {
             } else if (categoryChoice == cancelMenu) {
                 System.out.println("주문을 취소했습니다.");
                 cart.clear();
-                return;
+                System.out.println();
+                continue;
             } else {
                 System.out.println("올바른 숫자를 입력하세요!");
             }
@@ -230,7 +231,7 @@ public class CommerceSystem {
     }
 
     // CartItem 클래스 생성 (병렬배열 제거 및 단일배열로 수정하기 위함)
-    class CartItem {
+    static class CartItem {
         private final Product product;
         private final int cartStock;
 
