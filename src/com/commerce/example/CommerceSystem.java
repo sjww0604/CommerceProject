@@ -13,9 +13,8 @@ public class CommerceSystem {
     private final Category furniture;
     private final Scanner sc = new Scanner(System.in); // 입력 담당
 
-    /* 장바구니 필드 추가 */
-    private final List<Product> cart = new ArrayList<>();
-    private final List<Integer> cartCounts = new ArrayList<>(); // 장바구니에 상품별 담긴 수량 계산을 하기 위한 리스트 선언
+    /* 장바구니 필드 */
+    private final List<Product> cart = new ArrayList<>(); // 단일 배열로 수정
 
     // 생성자
     public CommerceSystem(Category electronics, Category clothes, Category foods, Category furniture) {
@@ -225,6 +224,22 @@ public class CommerceSystem {
         } else {
             System.out.println("올바른 숫자를 입력하세요!");
             return;
+        }
+    }
+
+    // CartItem 클래스 생성 (병렬배열 제거 및 단일배열로 수정하기 위함)
+    public class CartItem {
+        private  Product product;
+        private int cartStock;
+        public CartItem(Product product, int cartStock) {
+            this.product = product;
+            this.cartStock = cartStock;
+        }
+        public Product getProduct() {
+            return product;
+        }
+        public int getCartStock() {
+            return cartStock;
         }
     }
 }
