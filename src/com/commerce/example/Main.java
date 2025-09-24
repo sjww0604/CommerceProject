@@ -1,6 +1,7 @@
 package com.commerce.example;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Main {
@@ -35,7 +36,8 @@ public class Main {
         furniture.addProduct(new Product("Sofa", 550000, "소파", 5));
 
         // CommerceSystem 객체 생성(카테고리 주입) 및 프로그램 실행(start 루프)
-        CommerceSystem system = new CommerceSystem(electronics, clothes, foods, furniture);
+        List<Category> categories = Arrays.asList(electronics, clothes, foods, furniture);
+        CommerceSystem system = new CommerceSystem(categories);
         system.start();
     }
 }

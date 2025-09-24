@@ -6,29 +6,16 @@ import java.util.Scanner;
 
 /* 프로그램 비즈니스 로직 클래스 */
 public class CommerceSystem {
-    /* 속성 4개의 카테고리 속성 추가 */
     private final List<Category> categories = new ArrayList<>(); // 카테고리 필드 -> 카테고리 리스트 형태로 전환 및 통합
-    private final Category electronics;
-    private final Category clothes;
-    private final Category foods;
-    private final Category furniture;
     private final Scanner sc = new Scanner(System.in); // 입력 담당
 
     /* 장바구니 필드 */
     private final List<CartItem> cart = new ArrayList<>(); // 병렬 배열 제거 : CartItem 기반으로 변경
 
     // 생성자
-    public CommerceSystem(Category electronics, Category clothes, Category foods, Category furniture) {
-        this.electronics = electronics;
-        this.clothes = clothes;
-        this.foods = foods;
-        this.furniture = furniture;
-
+    public CommerceSystem(List<Category> initialCategories) {
         /* 카테고리 리스트에 등록 */
-        categories.add(electronics);
-        categories.add(clothes);
-        categories.add(foods);
-        categories.add(furniture);
+        this.categories.addAll(initialCategories);
     }
 
     /* 초기화면 기능 및 검증 정적 화면에서 동적 화면으로 구성 변경 */
