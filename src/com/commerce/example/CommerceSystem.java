@@ -7,6 +7,7 @@ import java.util.Scanner;
 /* 프로그램 비즈니스 로직 클래스 */
 public class CommerceSystem {
     /* 속성 4개의 카테고리 속성 추가 */
+    private final List<Category> categories = new ArrayList<>(); // 카테고리 필드 -> 카테고리 리스트 형태로 전환 및 통합
     private final Category electronics;
     private final Category clothes;
     private final Category foods;
@@ -22,51 +23,53 @@ public class CommerceSystem {
         this.clothes = clothes;
         this.foods = foods;
         this.furniture = furniture;
+
+        /* 카테고리 리스트에 등록 */
+        categories.add(electronics);
+        categories.add(clothes);
+        categories.add(foods);
+        categories.add(furniture);
     }
 
-    // 초기화면 기능 및 검증
+    /* 초기화면 기능 및 검증 정적 화면에서 동적 화면으로 구성 변경 */
     public void start() {
         boolean mainStatus = true;
         while (mainStatus) {
             displayMainMenu(); // 프로그램 초기화면 구성
             int categoryChoice = sc.nextInt();
 
-            switch (categoryChoice) {
-                case 0:
-                    mainStatus = false;
-                    System.out.println("커머스 플랫폼을 종료합니다.");
-                    break;
-                case 1:
-                    browseCategory(electronics);
-                    break;
-                case 2:
-                    browseCategory(clothes);
-                    break;
-                case 3:
-                    browseCategory(foods);
-                    break;
-                case 4:
-                    browseCategory(furniture);
-                    break;
-                case 5:
-                    showCart();
-                    order();
-                    break;
-                default:
-                    System.out.println("올바른 숫자를 입력하세요!");
-                    continue; // 메인 메뉴로 복귀
-                    //화면: 카테고리 내부(상품 목록 및 상품 상세)
+            if (categoryChoice == 0) {
+                mainStatus = false;
+                System.out.println("커머스 플랫폼을 종료합니다.");
+                continue;
+            }
+            int categorySize = categories.size(); // 카테고리 개수
+            int cartMenu = categorySize + 1; // 장바구니 확인
+            int cancelMenu = categorySize + 2; // 주문 취소
+
+            if (categoryChoice >= 1 && categoryChoice <= categorySize) {
+                Category selectedCategory = categories.get(categoryChoice - 1);
+                browseCategory(selectedCategory);
+            } else if (categoryChoice == cartMenu) {
+                showCart();
+                order();
+            } else if (categoryChoice == cancelMenu) {
+                System.out.println("주문을 취소했습니다.");
+                cart.clear();
+                return;
+            } else {
+                System.out.println("올바른 숫자를 입력하세요!");
             }
         }
     }
 
-    // 메인 메뉴 화면 출력
+    // 메인 메뉴 화면 출력 categories 리스트 내 정보를 모두 나타냄
     private void displayMainMenu() {
         System.out.println("[ 실시간 커머스 플랫폼 메인 ]");
-        System.out.println("1. " + electronics.getCategoryName());
-        System.out.println("2. " + clothes.getCategoryName());
-        System.out.println("3. " + foods.getCategoryName());
-        System.out.println("4. " + furniture.getCategoryName());
+        for (int i = 0; i < categories.size(); i++) {
+            Category category = categories.get(i);
+            System.out.println((i + 1) +". " + category.getCategoryName());
+        }
         displayCartMenu();
         System.out.println("0. 종료 | 프로그램 종료");
     }
@@ -74,10 +77,13 @@ public class CommerceSystem {
     // 장바구니 관련 메뉴 출력
     private void displayCartMenu() {
         if (!cart.isEmpty()) {
+            int cartMenu = categories.size() + 1;
+            int cancelMenu = categories.size() + 2;
+
             System.out.println();
             System.out.println("[ 주문 관리 ]");
-            System.out.println("5. 장바구니 확인 | 장바구니를 확인 후 주문합니다.");
-            System.out.println("6. 주문 취소  | 진행중인 주문을 취소합니다. ");
+            System.out.println(cartMenu + ". 장바구니 확인 | 장바구니를 확인 후 주문합니다.");
+            System.out.println(cancelMenu + ". 주문 취소  | 진행중인 주문을 취소합니다. ");
         }
     }
 
