@@ -252,13 +252,14 @@ public class CommerceSystem {
     /* Customer 기능 관련 추가 예정 */
     private void showAccountMenu() {
         System.out.println("[ 관리자 모드 ]");
-        String[] adminMenu = {"상품 추가", "상품 수정", "상품 삭제", "전체 상품 현황"};
+        String[] adminMenu = {"상품 추가", "상품 수정", "상품 삭제", "전체 상품 현황", };
         int accountMenuChoice;
 
         for (int i = 0; i < adminMenu.length; i++) {
             String printAdminMenu = String.format("%d. %s", i + 1, adminMenu[i]);
             System.out.println(printAdminMenu);
             }
+        System.out.println("0. 메인으로 돌아가기");
         accountMenuChoice = sc.nextInt();
         sc.nextLine();
         switch (accountMenuChoice) {
@@ -275,7 +276,6 @@ public class CommerceSystem {
                 allProducts();
                 break;
             case 0:
-                System.out.println("메인으로 돌아가기");
                 return;
             default:
                 System.out.println("올바른 숫자를 입력하세요!");
@@ -469,7 +469,77 @@ public class CommerceSystem {
     }
 
     /*상품 삭제 기능*/
-    private void removeProduct() {}
+    private void removeProduct() {
+        System.out.print("삭제할 상품명을 입력해주세요: ");
+        String targetName = sc.nextLine().trim();
+        while (targetName.isEmpty()) {
+            System.out.print("상품명이 비었습니다. 삭제할 상품명을 다시 입력하세요: ");
+            targetName = sc.nextLine().trim();
+        }
+        Category findremoveCat = null;
+        Product findProd = null;
+        int foundIndex = -1; // 삭제할 상품의 리스트 위치를 찾을 인덱스 값 설정
+
+        for (Category cat : categories) {
+            for (int j = 0; j < cat.size(); j++) {
+                Product prod = cat.getProduct(j);
+                if (prod.getPdName().equals(targetName)) {
+                    findremoveCat = cat;
+                    findProd = prod;
+                    foundIndex = j;
+                    break; // 안쪽 루프만 종료
+                }
+            }
+            if (findProd != null) { // 바깥 루프도 끊기
+                break;
+            }
+        }
+        if (findProd == null) {
+            System.out.println("일치하는 상품명을 찾지 못했습니다.");
+            return;
+        }
+        // 하위 삭제 메뉴
+        String beforeProduct = String.format("%-13s | %,10d원 | %s | 재고: %d개",
+                findProd.getPdName(), findProd.getPdPrice(),
+                findProd.getPdDescription(), findProd.getPdStock()
+        );
+        System.out.println("[ 선택된 상품 ]");
+        System.out.println(beforeProduct);
+
+        System.out.println("1. 삭제(확정)");
+        System.out.println("2. 메뉴로 돌아가기");
+        int delChoice = sc.nextInt();
+        sc.nextLine();
+
+        switch (delChoice) {
+            case 1:
+                if (foundIndex < 0) {
+                    System.out.println("삭제할 상품을 찾지 못했습니다.");
+                    return;
+                }
+                findremoveCat.removeProduct(foundIndex);
+
+                for (int i = cart.size() -1; i>=0; i--){
+                    if (cart.get(i).getProduct().equals(findProd)) {
+                        cart.remove(i);
+                    }
+                }
+                String removeMsg = String.format("%s 상품이 삭제 되었습니다.",
+                        findProd.getPdName());
+                System.out.println(removeMsg);
+                return;
+            case 2:
+                System.out.println("메뉴로 돌아갑니다.");
+                return;
+            default:
+                System.out.println("올바른 숫자를 입력하세요!");
+                return;
+        }
+    }
+
+
+
+
 
     /*전체상품 출력기능*/
     private void allProducts() {}

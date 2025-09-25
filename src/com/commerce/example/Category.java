@@ -45,4 +45,8 @@ public class Category {
             System.out.println(formatted);
         }
     }
+
+    public void removeProduct(int index) { //객체 삭제 기능 추가
+        productList.remove(index); // Category 내부의 List<Product> 가정
+    }
 }
