@@ -7,7 +7,7 @@ public class Customer {
     /* 고객 기본 정보 */
     private String customerName; // 고객 이름
     private String customerEmail; // 고객 이메일 주소
-    private char customerRank; // 고객 등급
+    private CustomerRank customerRank; // Enum 클래스를 통한 등급 필드 선언
 
     /* 고객 계정 정보 - 관리자 모드 관련하여 우선 사용 */
     public static class Account {
@@ -30,7 +30,7 @@ public class Customer {
 
     /* 고객 정보와 계정 정보를 연결 - 후에 고객관련 세부정보 필요시 사용 */
     public Account account;
-    public Customer(String customerName, String customerEmail, char customerRank, Account account) {
+    public Customer(String customerName, String customerEmail, CustomerRank customerRank, Account account) {
         this.customerName = customerName;
         this.customerEmail = customerEmail;
         this.customerRank = customerRank;
@@ -39,7 +39,7 @@ public class Customer {
 
     public String getCustomerName() { return customerName; }
     public String getCustomerEmail() { return customerEmail; }
-    public char getCustomerRank() { return customerRank; }
+    public CustomerRank getCustomerRank() { return customerRank; }
     public Account getAccount() { return account; }
     //기능
 }

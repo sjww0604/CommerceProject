@@ -9,7 +9,7 @@ import java.util.List;
 public class Category {
     // 속성
     private final String categoryName; // 카테고리별 이름 필드 설정
-    private List<Product> productList; // product 관리 필드 (CommerceSystem -> Category 로 목적에 맞게 이동)
+    private final List<Product> productList; // product 관리 필드 (CommerceSystem -> Category 로 목적에 맞게 이동)
 
 
     // 생성자

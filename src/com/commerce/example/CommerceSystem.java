@@ -571,7 +571,6 @@ public class CommerceSystem {
                 System.out.println(formattedProd);
             }
         }
-
     }
 
 
