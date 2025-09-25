@@ -294,7 +294,7 @@ public class CommerceSystem {
 
         System.out.print("가격(원): ");
         int price = sc.nextInt();
-        sc.nextLine();
+        sc.nextLine(); //정수값 입력 후 개행문자 버퍼에 남아있는 이슈 해소를 위해 추가
         while (price <= 0) {
             System.out.print("단가는 0원 이하일 수 없습니다. 다시 입력: ");
             price = sc.nextInt();
@@ -346,7 +346,7 @@ public class CommerceSystem {
         int addConfirmChoice = sc.nextInt();
         if (addConfirmChoice == 1) {
             categories.get(idx).addProduct(p);
-            System.out.println("상품이 추가되었습니다.");
+            System.out.println("상품이 성공적으로 추가되었습니다!");
         } else if (addConfirmChoice == 2) {
             System.out.println("취소했습니다.");
         } else {
@@ -354,13 +354,124 @@ public class CommerceSystem {
         }
     }
     /*상품 수정 기능*/
+    private void fixProduct() {
+        System.out.print("수정할 상품명을 입력해주세요: ");
+        String targetName = sc.nextLine().trim();
+        while (targetName.isEmpty()) {
+            System.out.print("상품명이 비었습니다. 수정할 상품명을 다시 입력하세요: ");
+            targetName = sc.nextLine().trim();
+        }
+        Category findCat = null;
+        Product findProd = null;
 
-    private void fixProduct() {}
+        for (Category cat : categories) {
+            for (int j = 0; j < cat.size(); j++) {
+                Product prod = cat.getProduct(j);
+                if (prod.getPdName().equals(targetName)) {
+                    findCat = cat;
+                    findProd = prod;
+                    break; // 안쪽 루프만 종료
+                }
+            }
+            if (findProd != null) { // 바깥 루프도 끊기
+                break;
+            }
+        }
+        if (findProd == null) {
+            System.out.println("일치하는 상품명을 찾지 못했습니다.");
+            return;
+        }
+
+
+        // 하위 수정 메뉴 : 이름 고정, 가격/설명/재고 수정기능 구현
+        while (true) {
+            System.out.println("수정할 항목을 선택해주세요: ");
+            System.out.println("1. 가격");
+            System.out.println("2. 설명");
+            System.out.println("3. 재고수량");
+            System.out.println("0. 이전 메뉴");
+
+            int fixMenuChoice = sc.nextInt();
+            sc.nextLine();
+            if (fixMenuChoice < 0 || fixMenuChoice > 3) {
+                System.out.println("올바른 숫자를 입력하세요!");
+            }
+            switch (fixMenuChoice) {
+                case 1:
+                    String currentPrice = String.format("현재 가격: %,d원",
+                            findProd.getPdPrice());
+                    System.out.println(currentPrice);
+                    System.out.print("새로운 가격을 입력해주세요: ");
+                    int newPrice = sc.nextInt();
+                    sc.nextLine();
+                    while (newPrice <= 0) {
+                        System.out.println("0원 이하로는 수정할 수 없습니다. 다시 입력: ");
+                        newPrice = sc.nextInt();
+                        sc.nextLine();
+                    }
+
+                    String fixPriceMsg = String.format("%s의 가격이 %,d원 → %,d원으로 수정되었습니다.",
+                            findProd.getPdName(),
+                            findProd.getPdPrice(),
+                            newPrice
+                    );
+                    findProd.setPdPrice(newPrice);
+                    System.out.println(fixPriceMsg);
+                    break;
+                case 2:
+                    String currentDesciption = String.format("현재 설명 : %s",
+                            findProd.getPdDescription()
+                            );
+                    System.out.println(currentDesciption);
+                    System.out.print("수정할 상품설명을 입력해주세요: ");
+                    String newDesciption = sc.nextLine().trim();
+                    while (newDesciption.isEmpty()) {
+                        System.out.print("공백을 입력할 수 없습니다. 다시입력: ");
+                        newDesciption = sc.nextLine().trim();
+                    }
+
+                    String fixDescriptionMsg = String.format("%s의 설명이 '%s' → '%s'로 수정되었습니다.",
+                            findProd.getPdName(),
+                            findProd.getPdDescription(),
+                            newDesciption);
+                    System.out.println(fixDescriptionMsg);
+                    findProd.setPdDescription(newDesciption);
+                    break;
+
+                case 3:
+                    String currentStock = String.format("현재 재고 : %d",
+                            findProd.getPdStock());
+                    System.out.println(currentStock);
+                    System.out.print("수정할 재고수량을 입력해주세요: ");
+                    int newStock = sc.nextInt();
+                    sc.nextLine();
+                    while (newStock < 0) {
+                        System.out.println("재고는 음수로 설정할 수 없습니다. 다시입력: ");
+                        newStock = sc.nextInt();
+                        sc.nextLine();
+                    }
+                    String fixStockMsg = String.format("%s의 재고수량이 %d개 → %d개로 수정되었습니다.",
+                            findProd.getPdName(),
+                            findProd.getPdStock(),
+                            newStock
+                    );
+                    System.out.println(fixStockMsg);
+                    findProd.setPdStock(newStock);
+                    break;
+                case 0:
+                    System.out.println("기존 메뉴로 돌아갑니다.");
+                    return;
+                default:
+                    System.out.println("올바른 숫자를 입력하세요!");
+                    return;
+            }
+        }
+    }
+
     /*상품 삭제 기능*/
-
     private void removeProduct() {}
-    /*전체상품 출력기능*/
 
+    /*전체상품 출력기능*/
     private void allProducts() {}
 
 

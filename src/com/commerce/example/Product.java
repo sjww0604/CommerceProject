@@ -21,6 +21,17 @@ public class Product {
         this.pdStock = pdStock;
     }
 
+    /* 상품 수정을 위한 세터 추가 설정
+    * 외부에서 값을 변경할 수 있도록 허용 */
+    public void setPdName(String pdName) {
+        this.pdName = pdName;
+    }
+    public void setPdPrice(int pdPrice) {
+        this.pdPrice = pdPrice;
+    }
+    public void setPdDescription(String pdDescription) {
+        this.pdDescription = pdDescription;
+    }
     public void setPdStock(int pdStock) { // 주문 이후 재고수량 변경을 위한 세터 설정
         this.pdStock = pdStock;
     }
