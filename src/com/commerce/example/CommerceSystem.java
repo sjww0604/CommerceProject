@@ -54,7 +54,7 @@ public class CommerceSystem {
                 System.out.println();
                 continue;
             } else if (categoryChoice == adminMenu) {
-                System.out.println("[공사중] 관리자 모드");
+                showAccountMenu();
             } else {
                 System.out.println("올바른 숫자를 입력하세요!");
             }
@@ -248,6 +248,121 @@ public class CommerceSystem {
             return;
         }
     }
+
+    /* Customer 기능 관련 추가 예정 */
+    private void showAccountMenu() {
+        System.out.println("[ 관리자 모드 ]");
+        String[] adminMenu = {"상품 추가", "상품 수정", "상품 삭제", "전체 상품 현황"};
+        int accountMenuChoice;
+
+        for (int i = 0; i < adminMenu.length; i++) {
+            String printAdminMenu = String.format("%d. %s", i + 1, adminMenu[i]);
+            System.out.println(printAdminMenu);
+            }
+        accountMenuChoice = sc.nextInt();
+        sc.nextLine();
+        switch (accountMenuChoice) {
+            case 1:
+                addNewProduct();
+                break;
+            case 2:
+                fixProduct();
+                break;
+            case 3:
+                removeProduct();
+                break;
+            case 4:
+                allProducts();
+                break;
+            case 0:
+                System.out.println("메인으로 돌아가기");
+                return;
+            default:
+                System.out.println("올바른 숫자를 입력하세요!");
+                break;
+        }
+    }
+    /*관리자 모드 진입 시 기능 구현*/
+    /* 상품 등록 입력 폼 */
+    private Product productForm() {
+        System.out.print("상품명: ");
+        String name = sc.nextLine().trim();
+        while (name.isEmpty()) {
+            System.out.print("입력값은 공백일 수 없습니다. 다시 입력: ");
+            name = sc.nextLine().trim();
+        }
+
+        System.out.print("가격(원): ");
+        int price = sc.nextInt();
+        sc.nextLine();
+        while (price <= 0) {
+            System.out.print("단가는 0원 이하일 수 없습니다. 다시 입력: ");
+            price = sc.nextInt();
+            sc.nextLine();
+        }
+
+        System.out.print("설명: ");
+        String desc = sc.nextLine().trim();
+        while (desc.isEmpty()) {
+            System.out.print("상품 설명은 공백일 수 없습니다. 다시 입력: ");
+            desc = sc.nextLine().trim();
+        }
+
+        System.out.print("재고: ");
+        int stock = sc.nextInt();
+        sc.nextLine();
+        while (stock <= 0) {
+            System.out.print("재고는 1개 이상 등록되어야 합니다. 다시 입력: ");
+            stock = sc.nextInt();
+        }
+        return new Product (name, price, desc, stock);
+    }
+    /*상품 추가 기능*/
+    private void addNewProduct() {
+        System.out.println("어느 카테고리에 상품을 추가하시겠습니까?");
+        for (int i = 0; i < categories.size(); i++) {
+            System.out.println((i + 1) + ". " + categories.get(i).getCategoryName());
+        }
+        System.out.println("0. 취소");
+
+        int categoryChoice = sc.nextInt();
+        sc.nextLine();
+        if (categoryChoice == 0) return;
+
+        int idx = categoryChoice - 1;
+        if (idx < 0 || idx >= categories.size()) {
+            System.out.println("올바른 숫자를 입력하세요!");
+            return;
+        }
+
+        Product p = productForm();
+
+        String addList = String.format("%-13s | %,10d원 | %s | 재고: %d개",
+                p.getPdName(), p.getPdPrice(), p.getPdDescription(), p.getPdStock());
+        System.out.println(addList);
+        System.out.println("위 정보로 상품을 추가하시겠습니까?");
+        System.out.println("1. 확인   2. 취소");
+
+        int addConfirmChoice = sc.nextInt();
+        if (addConfirmChoice == 1) {
+            categories.get(idx).addProduct(p);
+            System.out.println("상품이 추가되었습니다.");
+        } else if (addConfirmChoice == 2) {
+            System.out.println("취소했습니다.");
+        } else {
+            System.out.println("올바른 숫자를 입력하세요");
+        }
+    }
+    /*상품 수정 기능*/
+
+    private void fixProduct() {}
+    /*상품 삭제 기능*/
+
+    private void removeProduct() {}
+    /*전체상품 출력기능*/
+
+    private void allProducts() {}
+
 
     // CartItem 클래스 생성 (병렬배열 제거 및 단일배열로 수정하기 위함)
     static class CartItem {
