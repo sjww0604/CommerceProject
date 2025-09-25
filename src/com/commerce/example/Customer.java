@@ -9,7 +9,7 @@ public class Customer {
     private String customerEmail; // 고객 이메일 주소
     private char customerRank; // 고객 등급
 
-    /* 고객 계정 정보 */
+    /* 고객 계정 정보 - 관리자 모드 관련하여 우선 사용 */
     public static class Account {
     private String userId; // 로그인용 아이디
     private String userPassword; // 로그인용 비밀번호
@@ -26,7 +26,9 @@ public class Customer {
     }
 
     //생성자
-    /* 고객 정보와 계정 정보를 연결 */
+    public static final Account ADMIN_ACCOUNT = new Account("admin", "admin", true);
+
+    /* 고객 정보와 계정 정보를 연결 - 후에 고객관련 세부정보 필요시 사용 */
     public Account account;
     public Customer(String customerName, String customerEmail, char customerRank, Account account) {
         this.customerName = customerName;

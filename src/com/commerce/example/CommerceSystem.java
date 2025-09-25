@@ -54,7 +54,26 @@ public class CommerceSystem {
                 System.out.println();
                 continue;
             } else if (categoryChoice == adminMenu) {
-                showAccountMenu();
+                Customer.Account admin = Customer.ADMIN_ACCOUNT; // 마스터 계정 호출 및 정보를 admin에 담음
+                sc.nextLine(); // 개행 제거
+                boolean authed = false; // 인증 성공,실패의 상태값을 담기 위함
+                for (int tries = 0; tries < 3; tries++) {
+                    System.out.print("관리자 비밀번호를 입력하세요: ");
+                    String password = sc.nextLine().trim();   // 매 시도마다 새로 입력
+
+                    if (admin.getUserPassword().equals(password)) {
+                        authed = true;
+                        break;
+                    } else {
+                        System.out.println("비밀번호가 일치하지 않습니다! (남은 시도: " + (2 - tries) + ")");
+                    }
+                }
+
+                if (authed) {
+                    showAccountMenu();   // 성공일 때만 진입
+                } else {
+                    System.out.println("관리자 모드 진입이 거부되었습니다.");
+                }
             } else {
                 System.out.println("올바른 숫자를 입력하세요!");
             }
