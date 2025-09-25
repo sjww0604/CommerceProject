@@ -537,12 +537,23 @@ public class CommerceSystem {
         }
     }
 
-
-
-
-
     /*전체상품 출력기능*/
-    private void allProducts() {}
+    private void allProducts() {
+        System.out.println("[ 전체 상품 현황 ]");
+        for (Category cat : categories) { // 바깥 반복문 : 카테고리
+            System.out.println();
+            System.out.println("[ " + cat.getCategoryName() + " ]");
+            for (int j = 0; j < cat.size(); j++) { // 안쪽 반복문 : 상품명
+                Product prod = cat.getProduct(j);
+                String formattedProd = String.format("%-13s | %,10d원 | %s | 재고: %d개",
+                        prod.getPdName(), prod.getPdPrice(),
+                        prod.getPdDescription(), prod.getPdStock()
+                );
+                System.out.println(formattedProd);
+            }
+        }
+
+    }
 
 
     // CartItem 클래스 생성 (병렬배열 제거 및 단일배열로 수정하기 위함)
