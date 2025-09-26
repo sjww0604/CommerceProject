@@ -10,14 +10,14 @@ public class CommerceSystem {
     private final CartService cartService = new CartService(); // 장바구니 기능 위임
     private final ProductService productService = new ProductService(categories);  // 조회,검증,수정,삭제 로직 위임
     private final Scanner sc = new Scanner(System.in); // 입력 담당
+    private final AdminService adminService = new AdminService(sc, productService, cartService); // 관리자모드 입력 흐름 제어
+    private final OrderService orderService = new OrderService(sc, cartService); //주문처리 전담 서비스
 
     // 생성자
     public CommerceSystem(List<Category> initialCategories) {
         /* 카테고리 리스트에 등록 */
         this.categories.addAll(initialCategories);
     }
-    // 현재 고객 등급
-    private CustomerRank defaultCustomerRank;
 
     /* 초기화면 기능 및 검증 정적 화면에서 동적 화면으로 구성 변경 */
     public void start() {
@@ -25,10 +25,12 @@ public class CommerceSystem {
         while (mainStatus) {
             displayMainMenu(); // 프로그램 초기화면 구성
             int categoryChoice = sc.nextInt();
+            sc.nextLine();
             int categorySize = categories.size();
             int cartMenu = -1;
             int cancelMenu = -1;
             int adminMenu;
+
             if (cartService.getCartItems().isEmpty()) {
                 adminMenu = categorySize + 1; // 장바구니가 비었을 때 카테고리 다음 순번이 관리자 모드가 나오도록 번호 저장
             } else {
@@ -48,12 +50,11 @@ public class CommerceSystem {
                 browseCategory(selectedCategory);
             } else if (cartMenu != -1 && categoryChoice == cartMenu) {
                 showCart();
-                order();
+                orderService.showOrderMenu();
             } else if (cancelMenu != -1 && categoryChoice == cancelMenu) {
                 System.out.println("주문을 취소했습니다.");
                 cartService.clearCart();
                 System.out.println();
-                continue;
             } else if (categoryChoice == adminMenu) {
                 Customer.Account admin = Customer.ADMIN_ACCOUNT; // 마스터 계정 호출 및 정보를 admin에 담음
                 sc.nextLine(); // 개행 제거
@@ -71,7 +72,7 @@ public class CommerceSystem {
                 }
 
                 if (authed) {
-                    showAccountMenu();   // 성공일 때만 진입
+                    adminService.showMenu();   // 성공일 때만 진입
                 } else {
                     System.out.println("관리자 모드 진입이 거부되었습니다.");
                 }
@@ -125,6 +126,7 @@ public class CommerceSystem {
             System.out.println("0. 뒤로가기 ");
 
             int productChoice = sc.nextInt();
+            sc.nextLine();
             if (productChoice == 0) {
                 subStatus = false; // 뒤로가기
             } else if (productChoice >= 1 && productChoice <= category.size()) {
@@ -142,6 +144,7 @@ public class CommerceSystem {
                 String addCheck = String.format("%-10s %-15s", "1. 확인", "2. 취소");
                 System.out.println(addCheck);
                 int actionChoice = sc.nextInt();
+                sc.nextLine();
                 switch (actionChoice) {
                     case 1:
                         cartService.addCart(product);
@@ -160,350 +163,6 @@ public class CommerceSystem {
     // 장바구니 출력 기능
     private void showCart() {
         cartService.showCart();
-    }
-
-    // 총 금액 계산 기능
-    private int getCartTotalPrice() {
-        return  cartService.getCartTotalPrice();
-    }
-
-    // 등급 할인 적용 총액 계산
-    private int getDiscountedTotal(int subtotal, CustomerRank rank) {
-        return cartService.getDiscountedTotal(subtotal, rank);
-    }
-
-    // 할인 금액 계산
-    private int getDiscountAmount(int subtotal, CustomerRank rank) {
-        return cartService.getDiscountAmount(subtotal, rank);
-    }
-
-    /* 주문 기능 내 등급별 할인 적용 기능 추가 */
-    private void order() {
-        int subtotal = getCartTotalPrice();
-        System.out.println("고객 등급을 입력해주세요.");
-        while (true) {
-            /* 고객 등급별 할인율 정보를 나타내는 반복문 설정 */
-        for (int i = 0; i < CustomerRank.values().length; i++) {
-            CustomerRank rank = CustomerRank.values()[i];
-            System.out.printf("%d. %-10s : %.0f %% 할인%n",
-                    (i+1),
-                    rank.name(),
-                    rank.getDiscountRate()*100
-            );
-        }
-            System.out.println();
-            System.out.printf("%-10s %-15s %-10s%n", "1.등급 선택", "2. 메인으로 돌아가기", "3. 주문 확정");
-            int orderChoice = sc.nextInt();
-            sc.nextLine();
-
-            /* 주문확정 전 메뉴 입력값에 따라 고객등급을 적용 및 할인금액 노출을 시키는 조건문 설정 */
-            if (orderChoice == 1) {
-                System.out.print("등급번호를 입력하세요 (1~4) : ");
-                int rankChoice = sc.nextInt();
-                sc.nextLine();
-                /* 고객등급의 값을 각 입력값에 맞게 저장 */
-                switch (rankChoice) {
-                    case 1: defaultCustomerRank = CustomerRank.BRONZE; break;
-                    case 2: defaultCustomerRank = CustomerRank.SILVER; break;
-                    case 3: defaultCustomerRank = CustomerRank.GOLD; break;
-                    case 4: defaultCustomerRank = CustomerRank.PLATINUM; break;
-                    default:
-                        System.out.println("올바른 숫자를 입력하세요!");
-                        continue;
-                }
-                /* 기존에 선언했던 할인금액과 할인 이후 총 금액의 값을 받아와 정수형 변수에 저장
-                * 등급 선택에 따른 변화되는 수치를 보여줄 수 있도록 출력화면 구성 */
-                int discountAmt = getDiscountAmount(subtotal, defaultCustomerRank);
-                int finalPay = getDiscountedTotal(subtotal, defaultCustomerRank);
-                System.out.printf("\n할인 전 금액: %,d원%n", subtotal);
-                System.out.printf("%s 등급 할인(%.0f%%): -%,d원%n",
-                        defaultCustomerRank.name(), defaultCustomerRank.getDiscountRate() * 100, discountAmt);
-                System.out.printf("최종 결제 금액: %,d원\n%n", finalPay);
-            } else if (orderChoice == 2) {
-                return; // 메인으로
-            } else if (orderChoice == 3) {
-                // 최종 결제 확정
-                int discountAmt = getDiscountAmount(subtotal, defaultCustomerRank);
-                int finalPay = getDiscountedTotal(subtotal, defaultCustomerRank);
-
-                System.out.println("주문이 완료되었습니다!!");
-                System.out.printf("할인 전 금액: %,d원%n", subtotal);
-                System.out.printf("%s 등급 할인(%.0f%%): -%,d원%n", defaultCustomerRank.name(), defaultCustomerRank.getDiscountRate() * 100, discountAmt);
-                System.out.printf("최종 결제 금액: %,d원%n", finalPay);
-
-                // 재고 차감
-                for (int i = 0; i < cartService.getCartItems().size(); i++) {
-                    CartItem item = cartService.getCartItems().get(i);
-                    Product product = item.product();
-                    int cartStock = item.cartStock();
-
-                    int beforeStock = product.getPdStock();
-                    int afterStock = beforeStock - cartStock;
-                    product.setPdStock(afterStock);
-
-                    String stockStatus = String.format("%s 재고가 %d개 → %d개로 업데이트되었습니다.",
-                            product.getPdName(), beforeStock, afterStock);
-                    System.out.println(stockStatus);
-                }
-                System.out.println();
-
-                cartService.clearCart(); // 장바구니 비우기
-                return;       // 주문 종료 후 메인으로
-
-            } else {
-                System.out.println("올바른 숫자를 입력하세요!");
-            }
-        }
-    }
-
-    /* Customer 기능 관련 추가 예정 */
-    private void showAccountMenu() {
-        System.out.println("[ 관리자 모드 ]");
-        String[] adminMenu = {"상품 추가", "상품 수정", "상품 삭제", "전체 상품 현황", };
-        int accountMenuChoice;
-
-        for (int i = 0; i < adminMenu.length; i++) {
-            String printAdminMenu = String.format("%d. %s", i + 1, adminMenu[i]);
-            System.out.println(printAdminMenu);
-            }
-        System.out.println("0. 메인으로 돌아가기");
-        accountMenuChoice = sc.nextInt();
-        sc.nextLine();
-        switch (accountMenuChoice) {
-            case 1:
-                addNewProduct();
-                break;
-            case 2:
-                fixProduct();
-                break;
-            case 3:
-                removeProduct();
-                break;
-            case 4:
-                allProducts();
-                break;
-            case 0:
-                return;
-            default:
-                System.out.println("올바른 숫자를 입력하세요!");
-                break;
-        }
-    }
-    /*관리자 모드 진입 시 기능 구현*/
-    /* 상품 등록 입력 폼 */
-    private Product productForm() {
-        System.out.print("상품명: ");
-        String name = sc.nextLine().trim();
-        while (name.isEmpty()) {
-            System.out.print("입력값은 공백일 수 없습니다. 다시 입력: ");
-            name = sc.nextLine().trim();
-        }
-
-        System.out.print("가격(원): ");
-        int price = sc.nextInt();
-        sc.nextLine(); //정수값 입력 후 개행문자 버퍼에 남아있는 이슈 해소를 위해 추가
-        while (price <= 0) {
-            System.out.print("단가는 0원 이하일 수 없습니다. 다시 입력: ");
-            price = sc.nextInt();
-            sc.nextLine();
-        }
-
-        System.out.print("설명: ");
-        String desc = sc.nextLine().trim();
-        while (desc.isEmpty()) {
-            System.out.print("상품 설명은 공백일 수 없습니다. 다시 입력: ");
-            desc = sc.nextLine().trim();
-        }
-
-        System.out.print("재고: ");
-        int stock = sc.nextInt();
-        sc.nextLine();
-        while (stock <= 0) {
-            System.out.print("재고는 1개 이상 등록되어야 합니다. 다시 입력: ");
-            stock = sc.nextInt();
-        }
-        return new Product (name, price, desc, stock);
-    }
-    /*상품 추가 기능*/
-    private void addNewProduct() {
-        System.out.println("어느 카테고리에 상품을 추가하시겠습니까?");
-        for (int i = 0; i < productService.getCategories().size(); i++) {
-            System.out.println((i + 1) + ". " + productService.getCategories().get(i).getCategoryName());
-        }
-        System.out.println("0. 취소");
-
-        int categoryChoice = sc.nextInt();
-        sc.nextLine();
-        if (categoryChoice == 0) return;
-
-        int idx = categoryChoice - 1;
-        if (idx < 0 || idx >= categories.size()) {
-            System.out.println("올바른 숫자를 입력하세요!");
-            return;
-        }
-
-        Product p = productForm();
-
-        String addList = String.format("%-13s | %,10d원 | %s | 재고: %d개",
-                p.getPdName(), p.getPdPrice(), p.getPdDescription(), p.getPdStock());
-        System.out.println(addList);
-        System.out.println("위 정보로 상품을 추가하시겠습니까?");
-        System.out.println("1. 확인   2. 취소");
-
-        int addConfirmChoice = sc.nextInt();
-        if (addConfirmChoice == 1) {
-            productService.addProduct(idx,p);
-            System.out.println("상품이 성공적으로 추가되었습니다!");
-        } else if (addConfirmChoice == 2) {
-            System.out.println("취소했습니다.");
-        } else {
-            System.out.println("올바른 숫자를 입력하세요");
-        }
-    }
-    /*상품 수정 기능*/
-    private void fixProduct() {
-        System.out.print("수정할 상품명을 입력해주세요: ");
-        String targetName = sc.nextLine().trim();
-        while (targetName.isEmpty()) {
-            System.out.print("상품명이 비었습니다. 수정할 상품명을 다시 입력하세요: ");
-            targetName = sc.nextLine().trim();
-        }
-
-        // 참조용 레코드를 활용하여 try-catch문으로 진행
-        ProductService.ProductRef ref;
-        try {
-            ref = productService.findByProductName(targetName);
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            System.out.println("일치하는 상품명을 찾지 못했습니다.");
-            return;
-        }
-        Product findProd = ref.product();
-
-
-        // 하위 수정 메뉴 : 이름 고정, 가격/설명/재고 수정기능 구현
-        while (true) {
-            System.out.println("수정할 항목을 선택해주세요: ");
-            System.out.println("1. 가격");
-            System.out.println("2. 설명");
-            System.out.println("3. 재고수량");
-            System.out.println("0. 이전 메뉴");
-
-            int fixMenuChoice = sc.nextInt();
-            sc.nextLine();
-            if (fixMenuChoice < 0 || fixMenuChoice > 3) {
-                System.out.println("올바른 숫자를 입력하세요!");
-            }
-            switch (fixMenuChoice) {
-                case 1:
-                    String currentPrice = String.format("현재 가격: %,d원",
-                            findProd.getPdPrice());
-                    System.out.println(currentPrice);
-                    System.out.print("새로운 가격을 입력해주세요: ");
-                    int newPrice = sc.nextInt();
-                    sc.nextLine();
-                    while (newPrice <= 0) {
-                        System.out.println("0원 이하로는 수정할 수 없습니다. 다시 입력: ");
-                        newPrice = sc.nextInt();
-                        sc.nextLine();
-                    }
-
-                    /* ProductService의 수정 로직을 따라 처리 */
-                    productService.updatePrice(findProd.getPdName(), newPrice);
-                    System.out.printf("%s의 가격이 %,d원 → %,d원으로 수정되었습니다.%n",
-                            findProd.getPdName(), findProd.getPdPrice(), newPrice);
-                    break;
-                case 2:
-                    String currentDescription = String.format("현재 설명 : %s", findProd.getPdDescription());
-                    System.out.println(currentDescription);
-                    System.out.print("수정할 상품설명을 입력해주세요: ");
-                    String newDescription = sc.nextLine().trim();
-                    while (newDescription.isEmpty()) {
-                        System.out.print("공백을 입력할 수 없습니다. 다시입력: ");
-                        newDescription = sc.nextLine().trim();
-                    }
-
-                    productService.updateDescription(findProd.getPdName(), newDescription);
-                    System.out.printf("%s의 설명이 '%s' → '%s'로 수정되었습니다.%n",
-                            findProd.getPdName(), findProd.getPdDescription(), newDescription);
-                    break;
-
-                case 3:
-                    String currentStock = String.format("현재 재고 : %d", findProd.getPdStock());
-                    System.out.println(currentStock);
-                    System.out.print("수정할 재고수량을 입력해주세요: ");
-                    int newStock = sc.nextInt();
-                    sc.nextLine();
-                    while (newStock < 0) {
-                        System.out.println("재고는 음수로 설정할 수 없습니다. 다시입력: ");
-                        newStock = sc.nextInt();
-                        sc.nextLine();
-                    }
-                    productService.updateStock(findProd.getPdName(), newStock);
-                    System.out.printf("%s의 재고수량이 %d개 → %d개로 수정되었습니다.%n",
-                            findProd.getPdName(), findProd.getPdStock(), newStock);
-                    break;
-
-                case 0:
-                    System.out.println("기존 메뉴로 돌아갑니다.");
-                    return;
-
-                default:
-                    System.out.println("올바른 숫자를 입력하세요!");
-                    return;
-            }
-        }
-    }
-
-    /*상품 삭제 기능*/
-    private void removeProduct() {
-        System.out.print("삭제할 상품명을 입력해주세요: ");
-        String targetName = sc.nextLine().trim();
-        while (targetName.isEmpty()) {
-            System.out.print("상품명이 비었습니다. 삭제할 상품명을 다시 입력하세요: ");
-            targetName = sc.nextLine().trim();
-        }
-        ProductService.ProductRef ref;
-        try {
-            ref = productService.findByProductName(targetName);
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            System.out.println("일치하는 상품명을 찾지 못했습니다.");
-            return;
-        }
-        Product findProd = ref.product();
-
-        // 미리보기
-        System.out.println("[ 선택된 상품 ]");
-        System.out.printf("%-13s | %,10d원 | %s | 재고: %d개%n",
-                findProd.getPdName(), findProd.getPdPrice(),
-                findProd.getPdDescription(), findProd.getPdStock());
-
-        System.out.println("1. 삭제(확정)");
-        System.out.println("2. 메뉴로 돌아가기");
-        int delChoice = sc.nextInt();
-        sc.nextLine();
-
-        switch (delChoice) {
-            case 1:
-                productService.removeByName(findProd.getPdName());
-                // 장바구니에서도 제거
-                for (int i = cartService.getCartItems().size() - 1; i >= 0; i--) {
-                    if (cartService.getCartItems().get(i).product().equals(findProd)) {
-                        cartService.getCartItems().remove(i);
-                    }
-                }
-                System.out.printf("%s 상품이 삭제 되었습니다.%n", findProd.getPdName());
-                return;
-            case 2:
-                System.out.println("메뉴로 돌아갑니다.");
-                return;
-            default:
-                System.out.println("올바른 숫자를 입력하세요!");
-        }
-    }
-
-    /*전체상품 출력기능*/
-    private void allProducts() {
-        productService.printAll();
     }
 
     /* CartItem 클래스 생성 (병렬배열 제거 및 단일배열로 수정하기 위함)
