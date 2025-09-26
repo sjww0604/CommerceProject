@@ -60,6 +60,7 @@ public class CartService {
         }
 
         int subtotal = getCartTotalPrice(); // 장바구니 총액을 우선 할인 계산하기 위한 subtotal에 저장
+        System.out.println();
         System.out.println("[ 총 주문 금액 ]");
         System.out.printf("%,d원%n", subtotal);
     }
