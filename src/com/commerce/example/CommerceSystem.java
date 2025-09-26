@@ -8,10 +8,8 @@ import java.util.Scanner;
 public class CommerceSystem {
     private final List<Category> categories = new ArrayList<>(); // 카테고리 필드 -> 카테고리 리스트 형태로 전환 및 통합
     private final CartService cartService = new CartService(); // 장바구니 기능 위임
+    private final ProductService productService = new ProductService(categories);  // 조회,검증,수정,삭제 로직 위임
     private final Scanner sc = new Scanner(System.in); // 입력 담당
-
-    /* 장바구니 필드 */
-    private final List<CartItem> cart = new ArrayList<>(); // 병렬 배열 제거 : CartItem 기반으로 변경
 
     // 생성자
     public CommerceSystem(List<Category> initialCategories) {
@@ -329,8 +327,8 @@ public class CommerceSystem {
     /*상품 추가 기능*/
     private void addNewProduct() {
         System.out.println("어느 카테고리에 상품을 추가하시겠습니까?");
-        for (int i = 0; i < categories.size(); i++) {
-            System.out.println((i + 1) + ". " + categories.get(i).getCategoryName());
+        for (int i = 0; i < productService.getCategories().size(); i++) {
+            System.out.println((i + 1) + ". " + productService.getCategories().get(i).getCategoryName());
         }
         System.out.println("0. 취소");
 
@@ -354,7 +352,7 @@ public class CommerceSystem {
 
         int addConfirmChoice = sc.nextInt();
         if (addConfirmChoice == 1) {
-            categories.get(idx).addProduct(p);
+            productService.addProduct(idx,p);
             System.out.println("상품이 성공적으로 추가되었습니다!");
         } else if (addConfirmChoice == 2) {
             System.out.println("취소했습니다.");
@@ -370,26 +368,16 @@ public class CommerceSystem {
             System.out.print("상품명이 비었습니다. 수정할 상품명을 다시 입력하세요: ");
             targetName = sc.nextLine().trim();
         }
-        Category findCat = null;
-        Product findProd = null;
 
-        for (Category cat : categories) {
-            for (int j = 0; j < cat.size(); j++) {
-                Product prod = cat.getProduct(j);
-                if (prod.getPdName().equals(targetName)) {
-                    findCat = cat;
-                    findProd = prod;
-                    break; // 안쪽 루프만 종료
-                }
-            }
-            if (findProd != null) { // 바깥 루프도 끊기
-                break;
-            }
-        }
-        if (findProd == null) {
+        // 참조용 레코드를 활용하여 try-catch문으로 진행
+        ProductService.ProductRef ref;
+        try {
+            ref = productService.findByProductName(targetName);
+        } catch (IllegalArgumentException | IllegalStateException e) {
             System.out.println("일치하는 상품명을 찾지 못했습니다.");
             return;
         }
+        Product findProd = ref.product();
 
 
         // 하위 수정 메뉴 : 이름 고정, 가격/설명/재고 수정기능 구현
@@ -419,18 +407,13 @@ public class CommerceSystem {
                         sc.nextLine();
                     }
 
-                    String fixPriceMsg = String.format("%s의 가격이 %,d원 → %,d원으로 수정되었습니다.",
-                            findProd.getPdName(),
-                            findProd.getPdPrice(),
-                            newPrice
-                    );
-                    findProd.setPdPrice(newPrice);
-                    System.out.println(fixPriceMsg);
+                    /* ProductService의 수정 로직을 따라 처리 */
+                    productService.updatePrice(findProd.getPdName(), newPrice);
+                    System.out.printf("%s의 가격이 %,d원 → %,d원으로 수정되었습니다.%n",
+                            findProd.getPdName(), findProd.getPdPrice(), newPrice);
                     break;
                 case 2:
-                    String currentDescription = String.format("현재 설명 : %s",
-                            findProd.getPdDescription()
-                            );
+                    String currentDescription = String.format("현재 설명 : %s", findProd.getPdDescription());
                     System.out.println(currentDescription);
                     System.out.print("수정할 상품설명을 입력해주세요: ");
                     String newDescription = sc.nextLine().trim();
@@ -439,17 +422,13 @@ public class CommerceSystem {
                         newDescription = sc.nextLine().trim();
                     }
 
-                    String fixDescriptionMsg = String.format("%s의 설명이 '%s' → '%s'로 수정되었습니다.",
-                            findProd.getPdName(),
-                            findProd.getPdDescription(),
-                            newDescription);
-                    System.out.println(fixDescriptionMsg);
-                    findProd.setPdDescription(newDescription);
+                    productService.updateDescription(findProd.getPdName(), newDescription);
+                    System.out.printf("%s의 설명이 '%s' → '%s'로 수정되었습니다.%n",
+                            findProd.getPdName(), findProd.getPdDescription(), newDescription);
                     break;
 
                 case 3:
-                    String currentStock = String.format("현재 재고 : %d",
-                            findProd.getPdStock());
+                    String currentStock = String.format("현재 재고 : %d", findProd.getPdStock());
                     System.out.println(currentStock);
                     System.out.print("수정할 재고수량을 입력해주세요: ");
                     int newStock = sc.nextInt();
@@ -459,17 +438,15 @@ public class CommerceSystem {
                         newStock = sc.nextInt();
                         sc.nextLine();
                     }
-                    String fixStockMsg = String.format("%s의 재고수량이 %d개 → %d개로 수정되었습니다.",
-                            findProd.getPdName(),
-                            findProd.getPdStock(),
-                            newStock
-                    );
-                    System.out.println(fixStockMsg);
-                    findProd.setPdStock(newStock);
+                    productService.updateStock(findProd.getPdName(), newStock);
+                    System.out.printf("%s의 재고수량이 %d개 → %d개로 수정되었습니다.%n",
+                            findProd.getPdName(), findProd.getPdStock(), newStock);
                     break;
+
                 case 0:
                     System.out.println("기존 메뉴로 돌아갑니다.");
                     return;
+
                 default:
                     System.out.println("올바른 숫자를 입력하세요!");
                     return;
@@ -485,35 +462,20 @@ public class CommerceSystem {
             System.out.print("상품명이 비었습니다. 삭제할 상품명을 다시 입력하세요: ");
             targetName = sc.nextLine().trim();
         }
-        Category findremoveCat = null;
-        Product findProd = null;
-        int foundIndex = -1; // 삭제할 상품의 리스트 위치를 찾을 인덱스 값 설정
-
-        for (Category cat : categories) {
-            for (int j = 0; j < cat.size(); j++) {
-                Product prod = cat.getProduct(j);
-                if (prod.getPdName().equals(targetName)) {
-                    findremoveCat = cat;
-                    findProd = prod;
-                    foundIndex = j;
-                    break; // 안쪽 루프만 종료
-                }
-            }
-            if (findProd != null) { // 바깥 루프도 끊기
-                break;
-            }
-        }
-        if (findProd == null) {
+        ProductService.ProductRef ref;
+        try {
+            ref = productService.findByProductName(targetName);
+        } catch (IllegalArgumentException | IllegalStateException e) {
             System.out.println("일치하는 상품명을 찾지 못했습니다.");
             return;
         }
-        // 하위 삭제 메뉴
-        String beforeProduct = String.format("%-13s | %,10d원 | %s | 재고: %d개",
-                findProd.getPdName(), findProd.getPdPrice(),
-                findProd.getPdDescription(), findProd.getPdStock()
-        );
+        Product findProd = ref.product();
+
+        // 미리보기
         System.out.println("[ 선택된 상품 ]");
-        System.out.println(beforeProduct);
+        System.out.printf("%-13s | %,10d원 | %s | 재고: %d개%n",
+                findProd.getPdName(), findProd.getPdPrice(),
+                findProd.getPdDescription(), findProd.getPdStock());
 
         System.out.println("1. 삭제(확정)");
         System.out.println("2. 메뉴로 돌아가기");
@@ -522,20 +484,14 @@ public class CommerceSystem {
 
         switch (delChoice) {
             case 1:
-                if (foundIndex < 0) {
-                    System.out.println("삭제할 상품을 찾지 못했습니다.");
-                    return;
-                }
-                findremoveCat.removeProduct(foundIndex);
-
-                for (int i = cartService.getCartItems().size() -1; i>=0; i--){
+                productService.removeByName(findProd.getPdName());
+                // 장바구니에서도 제거
+                for (int i = cartService.getCartItems().size() - 1; i >= 0; i--) {
                     if (cartService.getCartItems().get(i).product().equals(findProd)) {
                         cartService.getCartItems().remove(i);
                     }
                 }
-                String removeMsg = String.format("%s 상품이 삭제 되었습니다.",
-                        findProd.getPdName());
-                System.out.println(removeMsg);
+                System.out.printf("%s 상품이 삭제 되었습니다.%n", findProd.getPdName());
                 return;
             case 2:
                 System.out.println("메뉴로 돌아갑니다.");
@@ -547,21 +503,8 @@ public class CommerceSystem {
 
     /*전체상품 출력기능*/
     private void allProducts() {
-        System.out.println("[ 전체 상품 현황 ]");
-        for (Category cat : categories) { // 바깥 반복문 : 카테고리
-            System.out.println();
-            System.out.println("[ " + cat.getCategoryName() + " ]");
-            for (int j = 0; j < cat.size(); j++) { // 안쪽 반복문 : 상품명
-                Product prod = cat.getProduct(j);
-                String formattedProd = String.format("%-13s | %,10d원 | %s | 재고: %d개",
-                        prod.getPdName(), prod.getPdPrice(),
-                        prod.getPdDescription(), prod.getPdStock()
-                );
-                System.out.println(formattedProd);
-            }
-        }
+        productService.printAll();
     }
-
 
     /* CartItem 클래스 생성 (병렬배열 제거 및 단일배열로 수정하기 위함)
     * record 선언을 통해 getProduct -> item.Product 형식의 리팩토링 진행*/
