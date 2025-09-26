@@ -25,6 +25,14 @@ public class ProductService {
         return categories.get(index);
     }
 
+    /* 가격에 따른 상품 필터 */
+    public List<Product> findByUnder(int maxPrice) {
+        return categories.stream()
+                .flatMap(cat -> cat.getProducts().stream()) // 여기서 getProducts() 사용 가능
+                .filter(p -> p.getPdPrice() <= maxPrice)
+                .toList();
+    }
+
     /* 상품 참조용 레코드 (카테고리/위치/상품)
      * record에 내재된 기능으로 인해 메서드처럼 호출 가능*/
     public record ProductRef(Category category, int index, Product product) {

@@ -7,6 +7,7 @@ import com.commerce.example.domain.Product;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.IntStream;
 
 /* 프로그램 비즈니스 로직 클래스 */
 public class CommerceSystem {
@@ -123,43 +124,86 @@ public class CommerceSystem {
         boolean subStatus = true;
         while (subStatus) {
             System.out.println();
-            String catTitle = String.format("[ %s 카테고리 ]", category.getCategoryName());
-            System.out.println(catTitle);
-            category.printProducts(); // 전체 리스트 출력
+            System.out.printf("[ %s 카테고리 ]%n", category.getCategoryName());
+            System.out.println("1. 전체 상품 보기");
+            System.out.println("2. 가격대별 필터링 (100만원 이하)");
+            System.out.println("3. 가격대별 필터링 (100만원 초과)");
             System.out.println("0. 뒤로가기 ");
 
+            int submenu = sc.nextInt();
+            sc.nextLine();
+            if (submenu == 0) {
+                subStatus = false; // 뒤로가기
+                continue;
+            }
+
+            // 카테고리 내 상품 목록 (임시 기준 리스트)
+            List<Product> base = IntStream.range(0, category.size())
+                    .mapToObj(category::getProduct)
+                    .toList();
+
+            // 선택에 따라 임시 디스플레이 리스트 구성
+            List<Product> display = switch (submenu) {
+                case 1 -> base; // 전체 리스트
+                case 2 -> base.stream()
+                        .filter(p -> p.getPdPrice() <= 1_000_000)
+                        .toList();
+                case 3 -> base.stream()
+                        .filter(p -> p.getPdPrice() > 1_000_000)
+                        .toList();
+                default -> {
+                    System.out.println("올바른 숫자를 입력하세요!");
+                    yield List.of();
+                }
+            };
+
+            if (display.isEmpty()) {
+                System.out.println("조건에 맞는 상품이 없습니다.");
+                continue;
+            }
+
+            //필터링 결과 출력
+            System.out.println();
+            String title = switch (submenu) {
+                case 1 -> "[ 전체 상품 목록 ]";
+                case 2 -> "[ 100만원 이하 상품 목록 ]";
+                case 3 -> "[ 100만원 초과 상품 목록 ]";
+                default -> "[ 상품 목록 ]";
+            };
+            System.out.println(title);
+            for (int i = 0; i < display.size(); i++) {
+                Product p = display.get(i);
+                String line = String.format("%d. %-15s | %,10d원 | %s | 재고: %d개",
+                        (i + 1), p.getPdName(), p.getPdPrice(), p.getPdDescription(), p.getPdStock());
+                System.out.println(line);
+            }
+            System.out.println("0. 뒤로가기");
+
+            // 개별 상품 선택 -> 장바구니 추가 확인
             int productChoice = sc.nextInt();
             sc.nextLine();
             if (productChoice == 0) {
-                subStatus = false; // 뒤로가기
-            } else if (productChoice >= 1 && productChoice <= category.size()) {
-                Product product = category.getProduct(productChoice - 1);
-                String productResultList = String.format(
-                        "%d. %-15s | %,10d원 | %s | %d개",
-                        productChoice,
-                        product.getPdName(),
-                        product.getPdPrice(),
-                        product.getPdDescription(),
-                        product.getPdStock()
-                );
-                System.out.println(productResultList);
-                System.out.println("위 상품을 장바구니에 추가하시겠습니까?");
-                String addCheck = String.format("%-10s %-15s", "1. 확인", "2. 취소");
-                System.out.println(addCheck);
-                int actionChoice = sc.nextInt();
-                sc.nextLine();
-                switch (actionChoice) {
-                    case 1:
-                        cartService.addCart(product);
-                        break;
-                    case 2:
-                        continue; // 카테고리 화면으로 돌아가기
-                    default:
-                        System.out.println("올바른 숫자를 입력하세요!");
-                        continue; // 잘못 입력 → 다시 카테고리 루프 반복
-                }
-            } else {
-                System.out.println("올바른 숫자를 입력하세요! ");
+                continue;
+            }
+            if (productChoice < 1 || productChoice > display.size()) {
+                System.out.println("올바른 숫자를 입력하세요!");
+                continue;
+            }
+
+            Product selected = display.get(productChoice - 1);
+            String productResultList = String.format(
+                    "%s | %,d원 | %s | 재고: %d개",
+                    selected.getPdName(), selected.getPdPrice(), selected.getPdDescription(), selected.getPdStock()
+            );
+            System.out.println("선택한 상품: " + productResultList);
+            System.out.println("위 상품을 장바구니에 추가하시겠습니까?");
+            System.out.printf("%-10s %-10s%n", "1.확인", "2. 취소");
+            int actionChoice = sc.nextInt();
+            sc.nextLine();
+            switch (actionChoice) {
+                case 1 -> cartService.addCart(selected);
+                case 2 -> {}
+                default -> System.out.println("올바른 숫자를 입력하세요!");
             }
         }
     }

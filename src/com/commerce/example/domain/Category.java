@@ -28,22 +28,21 @@ public class Category {
     public Product getProduct(int index) { // 특정 번호에 맞는 상품 반환
         return productList.get(index);
     }
+    public List<Product> getProducts() { // 전체 상품 읽기 접근자 설정
+        return productList;
+    }
+
     public int size() { // 사이즈 반환
         return productList.size();
     }
 
     public void printProducts() { // 전체 출력 기능
-        for (int i = 0; i < productList.size(); i++) {
-            Product product = productList.get(i);
-            String formatted = String.format( // 출력 양식은 맞추되 저장되어있는 배열 전체 화면 출력을 위한 용도
-                    "%d. %-15s | %,10d원 | %s",
-                    i + 1,
-                    product.getPdName(),
-                    product.getPdPrice(),
-                    product.getPdDescription()
-            );
-            System.out.println(formatted);
-        }
+        /* 기존 for문 -> 스트림으로 변경 */
+        java.util.stream.IntStream.range(0, size()).forEach(i -> {
+            Product p = getProduct(i);
+            System.out.printf("%d. %-15s | %,10d원 | %s%n",
+                    i + 1, p.getPdName(), p.getPdPrice(), p.getPdDescription());
+        });
     }
 
     public void removeProduct(int index) { //객체 삭제 기능 추가
