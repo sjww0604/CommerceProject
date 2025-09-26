@@ -17,6 +17,8 @@ public class CommerceSystem {
         /* 카테고리 리스트에 등록 */
         this.categories.addAll(initialCategories);
     }
+    // 현재 고객 등급
+    private CustomerRank defaultCustomerRank;
 
     /* 초기화면 기능 및 검증 정적 화면에서 동적 화면으로 구성 변경 */
     public void start() {
@@ -161,14 +163,14 @@ public class CommerceSystem {
     private void addCart(Product product) {
         int foundIndex = -1; // 장바구니 리스트에 담긴 상품의 리스트 번호를 찾기 위해 설정
         for (int i = 0; i < cart.size(); i++) {
-            if (cart.get(i).getProduct().equals(product)) {
+            if (cart.get(i).product().equals(product)) {
                 foundIndex = i;
                 break;
             }
         }
 
         // 2) 장바구니 수량/보유 재고 파악 (루프 밖에서 1회)
-        int inCartStock = (foundIndex >= 0) ? cart.get(foundIndex).getCartStock() : 0;
+        int inCartStock = (foundIndex >= 0) ? cart.get(foundIndex).cartStock() : 0;
         int stock = product.getPdStock();
 
         // 3) 재고 검증: 장바구니 수량 + 1이 재고를 초과하면 거부
@@ -184,7 +186,7 @@ public class CommerceSystem {
         // 4) 추가/증량 처리 (루프 밖에서 1회)
         if (foundIndex >= 0) {
             CartItem item = cart.get(foundIndex);
-            cart.set(foundIndex, new CartItem(item.getProduct(), item.getCartStock() + 1));
+            cart.set(foundIndex, new CartItem(item.product(), item.cartStock() + 1));
         } else {
             cart.add(new CartItem(product, 1));
         }
@@ -201,8 +203,8 @@ public class CommerceSystem {
             System.out.println("아래와 같이 주문 하시겠습니까? ");
             for (int i = 0; i < cart.size(); i++) {
                 CartItem item = cart.get(i);
-                Product product = item.getProduct();
-                int cartStock = item.getCartStock();
+                Product product = item.product();
+                int cartStock = item.cartStock();
                 String cartList = String.format("%-13s | %,10d원 | %s | 수량: %d개",
                         product.getPdName(),
                         product.getPdPrice(),
@@ -212,11 +214,9 @@ public class CommerceSystem {
                 System.out.println(cartList);
             }
 
-        String total = String.format("%,d원", getCartTotalPrice()); // 장바구니에 담긴 상품의 총 가격을 출력
-        System.out.println();
+        int subtotal = getCartTotalPrice(); // 장바구니 총액을 우선 할인 계산하기 위한 subtotal에 저장
         System.out.println("[ 총 주문 금액 ]");
-        System.out.println(total);
-        System.out.println();
+        System.out.printf("%,d원%n", subtotal);
     }
 
     // 총 금액 계산 전용 기능 (외부 선언 및 호출 가능하도록 수정)
@@ -224,47 +224,98 @@ public class CommerceSystem {
         int totalPrice = 0;
         for (int i = 0; i < cart.size(); i++) {
             CartItem item = cart.get(i);
-            totalPrice += item.getProduct().getPdPrice() * item.getCartStock(); // 장바구니 상품 * 장바구니에 담긴 상품의 수량을 곱한 값을 총합으로 합침
+            totalPrice += item.product().getPdPrice() * item.cartStock(); // 장바구니 상품 * 장바구니에 담긴 상품의 수량을 곱한 값을 총합으로 합침
         }
         return totalPrice;
     }
 
-    // 주문 기능
+    // 등급 할인 적용 총액 계산
+    private int getDiscountedTotal(int subtotal, CustomerRank rank) {
+        return rank.apply(subtotal);
+    }
+
+    // 할인 금액 계산
+    private int getDiscountAmount(int subtotal, CustomerRank rank) {
+        return subtotal - getDiscountedTotal(subtotal, rank);
+    }
+
+
+    /* 주문 기능 내 등급별 할인 적용 기능 추가 */
     private void order() {
-        String orderCheck = String.format("%-10s %-15s", "1. 주문 확정", "2. 메인으로 돌아가기");
-        System.out.println(orderCheck);
-        int orderChoice = sc.nextInt();
-        if (orderChoice == 1) {
-            String orderTotal = String.format("%,d원", getCartTotalPrice());
-            System.out.println("주문이 완료되었습니다! 총 금액 : " + orderTotal);
-
-            // 장바구니의 주문수량만큼 재고 차감
-            for (int i = 0; i < cart.size(); i++) {
-                CartItem item = cart.get(i);
-                Product product = item.getProduct();
-                int cartStock = item.getCartStock();
-
-                int beforeStock = product.getPdStock();
-                int afterStock = beforeStock - cartStock;
-                product.setPdStock(afterStock);
-
-                String stockStatus = String.format("%s 재고가 %d개 → %d개로 업데이트 되었습니다.",
-                        product.getPdName(),
-                        beforeStock,
-                        afterStock
-                );
-                System.out.println(stockStatus);
-            }
+        int subtotal = getCartTotalPrice();
+        System.out.println("고객 등급을 입력해주세요.");
+        while (true) {
+            /* 고객 등급별 할인율 정보를 나타내는 반복문 설정 */
+        for (int i = 0; i < CustomerRank.values().length; i++) {
+            CustomerRank rank = CustomerRank.values()[i];
+            System.out.printf("%d. %-10s : %.0f %% 할인%n",
+                    (i+1),
+                    rank.name(),
+                    rank.getDiscountRate()*100
+            );
+        }
             System.out.println();
+            System.out.printf("%-10s %-15s %-10s%n", "1.등급 선택", "2. 메인으로 돌아가기", "3. 주문 확정");
+            int orderChoice = sc.nextInt();
+            sc.nextLine();
 
-            // 주문 처리 이후 장바구니 비우기
-            cart.clear();
+            /* 주문확정 전 메뉴 입력값에 따라 고객등급을 적용 및 할인금액 노출을 시키는 조건문 설정 */
+            if (orderChoice == 1) {
+                System.out.print("등급번호를 입력하세요 (1~4) : ");
+                int rankChoice = sc.nextInt();
+                sc.nextLine();
+                /* 고객등급의 값을 각 입력값에 맞게 저장 */
+                switch (rankChoice) {
+                    case 1: defaultCustomerRank = CustomerRank.BRONZE; break;
+                    case 2: defaultCustomerRank = CustomerRank.SILVER; break;
+                    case 3: defaultCustomerRank = CustomerRank.GOLD; break;
+                    case 4: defaultCustomerRank = CustomerRank.PLATINUM; break;
+                    default:
+                        System.out.println("올바른 숫자를 입력하세요!");
+                        continue;
+                }
+                /* 기존에 선언했던 할인금액과 할인 이후 총 금액의 값을 받아와 정수형 변수에 저장
+                * 등급 선택에 따른 변화되는 수치를 보여줄 수 있도록 출력화면 구성 */
+                int discountAmt = getDiscountAmount(subtotal, defaultCustomerRank);
+                int finalPay = getDiscountedTotal(subtotal, defaultCustomerRank);
+                System.out.printf("\n할인 전 금액: %,d원%n", subtotal);
+                System.out.printf("%s 등급 할인(%.0f%%): -%,d원%n",
+                        defaultCustomerRank.name(), defaultCustomerRank.getDiscountRate() * 100, discountAmt);
+                System.out.printf("최종 결제 금액: %,d원\n%n", finalPay);
+            } else if (orderChoice == 2) {
+                return; // 메인으로
+            } else if (orderChoice == 3) {
+                // 최종 결제 확정
+                int discountAmt = getDiscountAmount(subtotal, defaultCustomerRank);
+                int finalPay = getDiscountedTotal(subtotal, defaultCustomerRank);
 
-        } else if (orderChoice == 2) {
-            return;
-        } else {
-            System.out.println("올바른 숫자를 입력하세요!");
-            return;
+                System.out.println("주문이 완료되었습니다!!");
+                System.out.printf("할인 전 금액: %,d원%n", subtotal);
+                System.out.printf("%s 등급 할인(%.0f%%): -%,d원%n", defaultCustomerRank.name(), defaultCustomerRank.getDiscountRate() * 100, discountAmt);
+                System.out.printf("최종 결제 금액: %,d원%n", finalPay);
+
+                // 재고 차감
+                for (int i = 0; i < cart.size(); i++) {
+                    CartItem item = cart.get(i);
+                    Product product = item.product();
+                    int cartStock = item.cartStock();
+
+                    int beforeStock = product.getPdStock();
+                    int afterStock = beforeStock - cartStock;
+                    product.setPdStock(afterStock);
+
+                    String stockStatus = String.format("%s 재고가 %d개 → %d개로 업데이트되었습니다.",
+                            product.getPdName(), beforeStock, afterStock);
+                    System.out.println(stockStatus);
+                }
+                System.out.println();
+
+                cart.clear(); // 장바구니 비우기
+                return;       // 주문 종료 후 메인으로
+
+            } else {
+                System.out.println("올바른 숫자를 입력하세요!");
+            }
         }
     }
 
@@ -438,23 +489,23 @@ public class CommerceSystem {
                     System.out.println(fixPriceMsg);
                     break;
                 case 2:
-                    String currentDesciption = String.format("현재 설명 : %s",
+                    String currentDescription = String.format("현재 설명 : %s",
                             findProd.getPdDescription()
                             );
-                    System.out.println(currentDesciption);
+                    System.out.println(currentDescription);
                     System.out.print("수정할 상품설명을 입력해주세요: ");
-                    String newDesciption = sc.nextLine().trim();
-                    while (newDesciption.isEmpty()) {
+                    String newDescription = sc.nextLine().trim();
+                    while (newDescription.isEmpty()) {
                         System.out.print("공백을 입력할 수 없습니다. 다시입력: ");
-                        newDesciption = sc.nextLine().trim();
+                        newDescription = sc.nextLine().trim();
                     }
 
                     String fixDescriptionMsg = String.format("%s의 설명이 '%s' → '%s'로 수정되었습니다.",
                             findProd.getPdName(),
                             findProd.getPdDescription(),
-                            newDesciption);
+                            newDescription);
                     System.out.println(fixDescriptionMsg);
-                    findProd.setPdDescription(newDesciption);
+                    findProd.setPdDescription(newDescription);
                     break;
 
                 case 3:
@@ -539,7 +590,7 @@ public class CommerceSystem {
                 findremoveCat.removeProduct(foundIndex);
 
                 for (int i = cart.size() -1; i>=0; i--){
-                    if (cart.get(i).getProduct().equals(findProd)) {
+                    if (cart.get(i).product().equals(findProd)) {
                         cart.remove(i);
                     }
                 }
@@ -552,7 +603,6 @@ public class CommerceSystem {
                 return;
             default:
                 System.out.println("올바른 숫자를 입력하세요!");
-                return;
         }
     }
 
@@ -574,23 +624,9 @@ public class CommerceSystem {
     }
 
 
-    // CartItem 클래스 생성 (병렬배열 제거 및 단일배열로 수정하기 위함)
-    static class CartItem {
-        private final Product product;
-        private final int cartStock;
-
-        public CartItem(Product product, int cartStock) {
-            this.product = product;
-            this.cartStock = cartStock;
-        }
-
-        public Product getProduct() {
-            return product;
-        }
-
-        public int getCartStock() {
-            return cartStock;
-        }
+    /* CartItem 클래스 생성 (병렬배열 제거 및 단일배열로 수정하기 위함)
+    * record 선언을 통해 getProduct -> item.Product 형식의 리팩토링 진행*/
+        record CartItem(Product product, int cartStock) {
     }
 }
 
