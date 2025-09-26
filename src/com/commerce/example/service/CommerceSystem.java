@@ -61,7 +61,6 @@ public class CommerceSystem {
                 System.out.println();
             } else if (categoryChoice == adminMenu) {
                 Customer.Account admin = Customer.ADMIN_ACCOUNT; // 마스터 계정 호출 및 정보를 admin에 담음
-                sc.nextLine(); // 개행 제거
                 boolean authed = false; // 인증 성공,실패의 상태값을 담기 위함
                 for (int tries = 0; tries < 3; tries++) {
                     System.out.print("관리자 비밀번호를 입력하세요: ");

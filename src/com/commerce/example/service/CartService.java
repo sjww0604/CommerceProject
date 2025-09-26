@@ -8,7 +8,7 @@ import java.util.List;
 
 /* 장바구니 기능 클래스 생성 및 분리 진행 */
 public class CartService {
-    private final List<CommerceSystem.Cart> cart =  new ArrayList<>();
+    private final List<CommerceSystem.CartItem> cart =  new ArrayList<>();
     // 장바구니 추가 기능
     public void addCart(Product product) {
         int foundIndex = -1; // 장바구니 리스트에 담긴 상품의 리스트 번호를 찾기 위해 설정
