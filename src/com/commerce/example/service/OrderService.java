@@ -1,4 +1,7 @@
-package com.commerce.example;
+package com.commerce.example.service;
+
+import com.commerce.example.domain.CustomerRank;
+import com.commerce.example.domain.Product;
 
 import java.util.Scanner;
 

@@ -1,6 +1,7 @@
-package com.commerce.example;
+package com.commerce.example.domain;
 
-import java.util.ArrayList;
+import com.commerce.example.service.CommerceSystem;
+
 import java.util.Arrays;
 import java.util.List;
 

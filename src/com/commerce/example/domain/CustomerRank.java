@@ -1,4 +1,4 @@
-package com.commerce.example;
+package com.commerce.example.domain;
 
 public enum CustomerRank {
     /* 등급별 할인율을 double형으로 선언 */

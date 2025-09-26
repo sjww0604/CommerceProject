@@ -1,4 +1,4 @@
-package com.commerce.example;
+package com.commerce.example.domain;
 
 /* 고객 정보를 관리하는 클래스
 * 고객명, 이메일, 등급 필드를 가짐*/

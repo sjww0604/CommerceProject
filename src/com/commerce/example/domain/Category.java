@@ -1,4 +1,4 @@
-package com.commerce.example;
+package com.commerce.example.domain;
 
 
 import java.util.ArrayList;

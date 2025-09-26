@@ -1,4 +1,4 @@
-package com.commerce.example;
+package com.commerce.example.domain;
 
 /* 개별 상품 정보를 가지는 클래스
 * 상품명, 가격, 설명, 재고수량
