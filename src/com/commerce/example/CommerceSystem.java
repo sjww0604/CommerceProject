@@ -7,6 +7,7 @@ import java.util.Scanner;
 /* 프로그램 비즈니스 로직 클래스 */
 public class CommerceSystem {
     private final List<Category> categories = new ArrayList<>(); // 카테고리 필드 -> 카테고리 리스트 형태로 전환 및 통합
+    private final CartService cartService = new CartService(); // 장바구니 기능 위임
     private final Scanner sc = new Scanner(System.in); // 입력 담당
 
     /* 장바구니 필드 */
@@ -30,7 +31,7 @@ public class CommerceSystem {
             int cartMenu = -1;
             int cancelMenu = -1;
             int adminMenu;
-            if (cart.isEmpty()) {
+            if (cartService.getCartItems().isEmpty()) {
                 adminMenu = categorySize + 1; // 장바구니가 비었을 때 카테고리 다음 순번이 관리자 모드가 나오도록 번호 저장
             } else {
                 /* 장바구니가 있을 때 구현되어야 할 순번에 맞춰 값을 저장 */
@@ -52,7 +53,7 @@ public class CommerceSystem {
                 order();
             } else if (cancelMenu != -1 && categoryChoice == cancelMenu) {
                 System.out.println("주문을 취소했습니다.");
-                cart.clear();
+                cartService.clearCart();
                 System.out.println();
                 continue;
             } else if (categoryChoice == adminMenu) {
@@ -97,7 +98,7 @@ public class CommerceSystem {
 
     // 장바구니 관련 메뉴 출력
     private void displayCartMenu() {
-        if (!cart.isEmpty()) {
+        if (!cartService.getCartItems().isEmpty()) {
             int cartMenu = categories.size() + 1;
             int cancelMenu = categories.size() + 2;
 
@@ -111,7 +112,7 @@ public class CommerceSystem {
     // 관리자 모드 메뉴 출력
     private void displayAdminMenu() {
         int base = categories.size();
-        int adminMenu = cart.isEmpty() ? (base + 1) : (base + 3); // 장바구니가 비었을 땐
+        int adminMenu = cartService.getCartItems().isEmpty() ? (base + 1) : (base + 3); // 장바구니가 비었을 땐
             System.out.println(adminMenu + ". 관리자 모드");
     }
 
@@ -145,7 +146,7 @@ public class CommerceSystem {
                 int actionChoice = sc.nextInt();
                 switch (actionChoice) {
                     case 1:
-                        addCart(product);
+                        cartService.addCart(product);
                         break;
                     case 2:
                         continue; // 카테고리 화면으로 돌아가기
@@ -158,87 +159,25 @@ public class CommerceSystem {
             }
         }
     }
-
-    // 장바구니 추가 기능
-    private void addCart(Product product) {
-        int foundIndex = -1; // 장바구니 리스트에 담긴 상품의 리스트 번호를 찾기 위해 설정
-        for (int i = 0; i < cart.size(); i++) {
-            if (cart.get(i).product().equals(product)) {
-                foundIndex = i;
-                break;
-            }
-        }
-
-        // 2) 장바구니 수량/보유 재고 파악 (루프 밖에서 1회)
-        int inCartStock = (foundIndex >= 0) ? cart.get(foundIndex).cartStock() : 0;
-        int stock = product.getPdStock();
-
-        // 3) 재고 검증: 장바구니 수량 + 1이 재고를 초과하면 거부
-        if (inCartStock >= stock) {
-            String alertStock = String.format(
-                    "판매가능한 재고가 부족합니다. 현재 재고 %d개, 장바구니 수량 %d개",
-                    stock, inCartStock
-            );
-            System.out.println(alertStock);
-            return; // 중요: 추가하지 않고 종료
-            }
-
-        // 4) 추가/증량 처리 (루프 밖에서 1회)
-        if (foundIndex >= 0) {
-            CartItem item = cart.get(foundIndex);
-            cart.set(foundIndex, new CartItem(item.product(), item.cartStock() + 1));
-        } else {
-            cart.add(new CartItem(product, 1));
-        }
-
-        // 5) 안내 출력
-        System.out.println("=======================================");
-        String addCartItem = String.format(" %s 가 장바구니에 추가되었습니다.", product.getPdName());
-        System.out.println(addCartItem);
-    }
-
-
     // 장바구니 출력 기능
     private void showCart() {
-            System.out.println("아래와 같이 주문 하시겠습니까? ");
-            for (int i = 0; i < cart.size(); i++) {
-                CartItem item = cart.get(i);
-                Product product = item.product();
-                int cartStock = item.cartStock();
-                String cartList = String.format("%-13s | %,10d원 | %s | 수량: %d개",
-                        product.getPdName(),
-                        product.getPdPrice(),
-                        product.getPdDescription(),
-                        cartStock
-                );
-                System.out.println(cartList);
-            }
-
-        int subtotal = getCartTotalPrice(); // 장바구니 총액을 우선 할인 계산하기 위한 subtotal에 저장
-        System.out.println("[ 총 주문 금액 ]");
-        System.out.printf("%,d원%n", subtotal);
+        cartService.showCart();
     }
 
-    // 총 금액 계산 전용 기능 (외부 선언 및 호출 가능하도록 수정)
+    // 총 금액 계산 기능
     private int getCartTotalPrice() {
-        int totalPrice = 0;
-        for (int i = 0; i < cart.size(); i++) {
-            CartItem item = cart.get(i);
-            totalPrice += item.product().getPdPrice() * item.cartStock(); // 장바구니 상품 * 장바구니에 담긴 상품의 수량을 곱한 값을 총합으로 합침
-        }
-        return totalPrice;
+        return  cartService.getCartTotalPrice();
     }
 
     // 등급 할인 적용 총액 계산
     private int getDiscountedTotal(int subtotal, CustomerRank rank) {
-        return rank.apply(subtotal);
+        return cartService.getDiscountedTotal(subtotal, rank);
     }
 
     // 할인 금액 계산
     private int getDiscountAmount(int subtotal, CustomerRank rank) {
-        return subtotal - getDiscountedTotal(subtotal, rank);
+        return cartService.getDiscountAmount(subtotal, rank);
     }
-
 
     /* 주문 기능 내 등급별 할인 적용 기능 추가 */
     private void order() {
@@ -295,8 +234,8 @@ public class CommerceSystem {
                 System.out.printf("최종 결제 금액: %,d원%n", finalPay);
 
                 // 재고 차감
-                for (int i = 0; i < cart.size(); i++) {
-                    CartItem item = cart.get(i);
+                for (int i = 0; i < cartService.getCartItems().size(); i++) {
+                    CartItem item = cartService.getCartItems().get(i);
                     Product product = item.product();
                     int cartStock = item.cartStock();
 
@@ -310,7 +249,7 @@ public class CommerceSystem {
                 }
                 System.out.println();
 
-                cart.clear(); // 장바구니 비우기
+                cartService.clearCart(); // 장바구니 비우기
                 return;       // 주문 종료 후 메인으로
 
             } else {
@@ -589,9 +528,9 @@ public class CommerceSystem {
                 }
                 findremoveCat.removeProduct(foundIndex);
 
-                for (int i = cart.size() -1; i>=0; i--){
-                    if (cart.get(i).product().equals(findProd)) {
-                        cart.remove(i);
+                for (int i = cartService.getCartItems().size() -1; i>=0; i--){
+                    if (cartService.getCartItems().get(i).product().equals(findProd)) {
+                        cartService.getCartItems().remove(i);
                     }
                 }
                 String removeMsg = String.format("%s 상품이 삭제 되었습니다.",
