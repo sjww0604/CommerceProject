@@ -81,7 +81,7 @@ public class OrderService {
 
                 // 재고 차감
                 for (int i = 0; i < cartService.getCartItems().size(); i++) {
-                    CommerceSystem.CartItem item = cartService.getCartItems().get(i);
+                    CartService.CartItem item = cartService.getCartItems().get(i);
                     Product product = item.product();
                     int cartStock = item.cartStock();
                     int beforeStock = product.getPdStock();

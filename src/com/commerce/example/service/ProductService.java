@@ -2,6 +2,7 @@ package com.commerce.example.service;
 
 import com.commerce.example.domain.Category;
 import com.commerce.example.domain.Product;
+import com.commerce.example.view.Format;
 
 import java.util.List;
 
@@ -52,7 +53,7 @@ public class ProductService {
                 }
             }
         }
-        throw new IllegalStateException("일치하는 상품을 찾을 수 없습니다.");
+        throw new IllegalStateException("일치하는 상품을 찾을 수 없습니다." + name);
     }
 
     /* 카테고리에 상품 추가 */
@@ -96,8 +97,7 @@ public class ProductService {
             System.out.println("[ " + cat.getCategoryName() + " ]");
             for (int j = 0; j < cat.size(); j++) {
                 Product prod = cat.getProduct(j);
-                System.out.printf("%-13s | %,10d원 | %s | 재고: %d개%n",
-                        prod.getPdName(), prod.getPdPrice(), prod.getPdDescription(), prod.getPdStock());
+                System.out.println(Format.productLine(prod));
             }
         }
     }
