@@ -2,6 +2,8 @@ package com.commerce.example.service;
 
 import com.commerce.example.domain.CustomerRank;
 import com.commerce.example.domain.Product;
+import com.commerce.example.view.Format;
+import com.commerce.example.view.Message;
 
 import java.util.Scanner;
 
@@ -20,7 +22,7 @@ public class OrderService {
     /* 주문 처리 프로세스 : 장바구니 확인 -> 등급 선택 -> 주문 확정 */
     public void showOrderMenu() {
         if (cartService.getCartItems().isEmpty()) {
-            System.out.println("장바구니가 비어있습니다.");
+            System.out.println(Message.CART_EMPTY);
             return;
         }
         int subtotal = cartService.getCartTotalPrice();
@@ -29,13 +31,8 @@ public class OrderService {
             System.out.println("고객 등급을 입력해주세요.");
             for (int i = 0; i < CustomerRank.values().length; i++) {
                 CustomerRank rank =  CustomerRank.values()[i];
-                System.out.printf("%d. %-10s : %.0f %% 할인%n",
-                        (i+1),
-                        rank.name(),
-                        rank.getDiscountRate()*100
-                );
+                System.out.println(Format.rankLine(i+1, rank));
             }
-            System.out.println();
             System.out.printf("%-10s %-15s %-10s%n", "1.등급 선택", "2. 메인으로 돌아가기", "3. 주문 확정");
 
             int orderChoice = sc.nextInt();
@@ -56,47 +53,42 @@ public class OrderService {
                     case 4:
                         currentRank = CustomerRank.PLATINUM; break;
                     default:
-                        System.out.println("올바른 숫자를 입력하세요!");
+                        System.out.println(Message.INVALID_NUMBER);
                         continue;
                 }
                 /* 기존에 선언했던 할인금액과 할인 이후 총 금액의 값을 받아와 정수형 변수에 저장
                  * 등급 선택에 따른 변화되는 수치를 보여줄 수 있도록 출력화면 구성 */
                 int discountAmt = cartService.getDiscountAmount(subtotal, currentRank);
                 int finalPay = cartService.getDiscountedTotal(subtotal, currentRank);
-                System.out.printf("\n할인 전 금액: %,d원%n", subtotal);
-                System.out.printf("%s 등급 할인(%.0f%%): -%,d원%n",
-                        currentRank.name(), currentRank.getDiscountRate() * 100, discountAmt);
-                System.out.printf("최종 결제 금액: %,d원\n%n", finalPay);
+                System.out.println(Format.paymentSummary(subtotal, currentRank, discountAmt, finalPay));
+
             } else if (orderChoice == 2) {
                 return; // 메인으로
+
             } else if (orderChoice == 3) {
                 if (currentRank == null) {
                     System.out.println("고객 등급을 먼저 선택해주세요.");
                     System.out.println();
                     continue;
                 }
+
                 // 최종 결제 확정
                 int discountAmt = cartService.getDiscountAmount(subtotal, currentRank);
                 int finalPay = cartService.getDiscountedTotal(subtotal, currentRank);
 
                 System.out.println("주문이 완료되었습니다!!");
-                System.out.printf("할인 전 금액: %,d원%n", subtotal);
-                System.out.printf("%s 등급 할인(%.0f%%): -%,d원%n", currentRank.name(), currentRank.getDiscountRate() * 100, discountAmt);
-                System.out.printf("최종 결제 금액: %,d원%n", finalPay);
+                System.out.print(Format.paymentSummary(subtotal, currentRank, discountAmt, finalPay));
 
                 // 재고 차감
                 for (int i = 0; i < cartService.getCartItems().size(); i++) {
                     CommerceSystem.CartItem item = cartService.getCartItems().get(i);
                     Product product = item.product();
                     int cartStock = item.cartStock();
-
                     int beforeStock = product.getPdStock();
                     int afterStock = beforeStock - cartStock;
                     product.setPdStock(afterStock);
 
-                    String stockStatus = String.format("%s 재고가 %d개 → %d개로 업데이트되었습니다.",
-                            product.getPdName(), beforeStock, afterStock);
-                    System.out.println(stockStatus);
+                    System.out.println(Format.stockUpdate(product, beforeStock, afterStock));
                 }
                 System.out.println();
 
@@ -106,7 +98,9 @@ public class OrderService {
             } else {
                 System.out.println("올바른 숫자를 입력하세요!");
             }
+            System.out.println();
         }
+
     }
 }
 

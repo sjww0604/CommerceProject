@@ -29,7 +29,8 @@ public final class Format {
         return String.format("""
                 할인 전 금액 : %,d원
                 %s 등급 할인(%.0f%%) : -%,d원
-                최종 결제 금액: %,d원""",
+                최종 결제 금액: %,d원
+                """,
                 subtotal, rank.name(), rank.getDiscountRate()*100, discountAmt, finalPay);
     }
 
