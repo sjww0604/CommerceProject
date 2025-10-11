@@ -34,6 +34,20 @@ public final class Format {
                 subtotal, rank.name(), rank.getDiscountRate()*100, discountAmt, finalPay);
     }
 
+    // Format.java (추가)
+    public static String cartLine(Product p, int qty) {
+        return String.format("%-13s | %,10d원 | %s | 수량 %d개",
+                p.getPdName(), p.getPdPrice(), p.getPdDescription(), qty);
+    }
+
+    public static String outOfStock(Product p, int stock, int inCart) {
+        return String.format("재고 부족: %s (재고 %d개, 장바구니 %d개)", p.getPdName(), stock, inCart);
+    }
+
+    public static String addedToCart(String name, int qty) {
+        return String.format("'%s' %d개가 장바구니에 추가되었습니다.", name, qty);
+    }
+
     // 섹션 헤더
     public static String header(String title) {
         return String.format(Message.MENU_HEADER, title);
