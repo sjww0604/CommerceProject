@@ -3,6 +3,8 @@ package com.commerce.example.service;
 import com.commerce.example.domain.Category;
 import com.commerce.example.domain.Customer;
 import com.commerce.example.domain.Product;
+import com.commerce.example.view.Format;
+import com.commerce.example.view.Message;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +31,10 @@ public class CommerceSystem {
         boolean mainStatus = true;
         while (mainStatus) {
             displayMainMenu(); // 프로그램 초기화면 구성
+
             int categoryChoice = sc.nextInt();
             sc.nextLine();
+
             int categorySize = categories.size();
             int cartMenu = -1;
             int cancelMenu = -1;
@@ -53,13 +57,16 @@ public class CommerceSystem {
             if (categoryChoice >= 1 && categoryChoice <= categorySize) {
                 Category selectedCategory = categories.get(categoryChoice - 1);
                 browseCategory(selectedCategory);
+
             } else if (cartMenu != -1 && categoryChoice == cartMenu) {
                 showCart();
                 orderService.showOrderMenu();
+
             } else if (cancelMenu != -1 && categoryChoice == cancelMenu) {
                 System.out.println("주문을 취소했습니다.");
                 cartService.clearCart();
                 System.out.println();
+
             } else if (categoryChoice == adminMenu) {
                 Customer.Account admin = Customer.ADMIN_ACCOUNT; // 마스터 계정 호출 및 정보를 admin에 담음
                 boolean authed = false; // 인증 성공,실패의 상태값을 담기 위함
@@ -81,7 +88,7 @@ public class CommerceSystem {
                     System.out.println("관리자 모드 진입이 거부되었습니다.");
                 }
             } else {
-                System.out.println("올바른 숫자를 입력하세요!");
+                System.out.println(Message.INVALID_NUMBER);
             }
         }
     }
@@ -97,6 +104,7 @@ public class CommerceSystem {
         displayCartMenu();
         displayAdminMenu();
         System.out.println("0. 종료 | 프로그램 종료");
+        System.out.print(Message.PROMPT_SELECT);
     }
 
     // 장바구니 관련 메뉴 출력
@@ -129,6 +137,7 @@ public class CommerceSystem {
             System.out.println("2. 가격대별 필터링 (100만원 이하)");
             System.out.println("3. 가격대별 필터링 (100만원 초과)");
             System.out.println("0. 뒤로가기 ");
+            System.out.print(Message.PROMPT_SELECT);
 
             int submenu = sc.nextInt();
             sc.nextLine();
@@ -152,7 +161,7 @@ public class CommerceSystem {
                         .filter(p -> p.getPdPrice() > 1_000_000)
                         .toList();
                 default -> {
-                    System.out.println("올바른 숫자를 입력하세요!");
+                    System.out.println(Message.INVALID_NUMBER);
                     yield List.of();
                 }
             };
@@ -173,11 +182,10 @@ public class CommerceSystem {
             System.out.println(title);
             for (int i = 0; i < display.size(); i++) {
                 Product p = display.get(i);
-                String line = String.format("%d. %-15s | %,10d원 | %s | 재고: %d개",
-                        (i + 1), p.getPdName(), p.getPdPrice(), p.getPdDescription(), p.getPdStock());
-                System.out.println(line);
+                System.out.println((i+1) + ". " + Format.productLine(p));
             }
             System.out.println("0. 뒤로가기");
+            System.out.print(Message.PROMPT_SELECT);
 
             // 개별 상품 선택 -> 장바구니 추가 확인
             int productChoice = sc.nextInt();
@@ -186,7 +194,7 @@ public class CommerceSystem {
                 continue;
             }
             if (productChoice < 1 || productChoice > display.size()) {
-                System.out.println("올바른 숫자를 입력하세요!");
+                System.out.println(Message.INVALID_NUMBER);
                 continue;
             }
 
@@ -198,12 +206,14 @@ public class CommerceSystem {
             System.out.println("선택한 상품: " + productResultList);
             System.out.println("위 상품을 장바구니에 추가하시겠습니까?");
             System.out.printf("%-10s %-10s%n", "1.확인", "2. 취소");
+            System.out.print(Message.PROMPT_SELECT);
+
             int actionChoice = sc.nextInt();
             sc.nextLine();
             switch (actionChoice) {
                 case 1 -> cartService.addCart(selected);
                 case 2 -> {}
-                default -> System.out.println("올바른 숫자를 입력하세요!");
+                default -> System.out.println(Message.INVALID_NUMBER);
             }
         }
     }

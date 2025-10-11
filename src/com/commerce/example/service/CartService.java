@@ -74,7 +74,7 @@ public class CartService {
 
     // 등급 할인 적용 총액 계산
     public int getDiscountedTotal(int subtotal, CustomerRank rank) {
-        return rank.apply(subtotal);
+        return CustomerRank.apply(rank,subtotal);
     }
 
     // 할인 금액 계산
