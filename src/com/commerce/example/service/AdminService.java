@@ -1,6 +1,8 @@
 package com.commerce.example.service;
 
 import com.commerce.example.domain.Product;
+import com.commerce.example.view.Format;
+import com.commerce.example.view.Message;
 
 import java.util.Scanner;
 
@@ -30,23 +32,19 @@ public class AdminService {
             int choice = sc.nextInt();
             sc.nextLine();
             switch (choice) {
-                case 1:
-                    addNewProduct();
+                case 1: addNewProduct();
                     break;
-                case 2:
-                    fixProduct();
+                case 2: fixProduct();
                     break;
-                case 3:
-                    removeProduct();
+                case 3: removeProduct();
                     break;
-                case 4:
-                    productService.printAll();
+                case 4: productService.printAll();
                     break;
                 case 0:
                     System.out.println("메인 메뉴로 돌아갑니다.");
                     return;
                 default:
-                    System.out.println("올바른 숫자를 입력하세요!");
+                    System.out.println(Message.INVALID_NUMBER);
                 }
             }
         }
@@ -62,7 +60,7 @@ public class AdminService {
         int categoryChoice = sc.nextInt();
         sc.nextLine(); // 개행 제거
         while (categoryChoice < 0 || categoryChoice > productService.getCategories().size()) {
-            System.out.println("숫자를 다시 입력하세요.");
+            System.out.println(Message.INVALID_NUMBER);
             categoryChoice = sc.nextInt();
             sc.nextLine();
         }
@@ -71,8 +69,7 @@ public class AdminService {
         int idx = categoryChoice - 1;
         Product p = productForm();
 
-        System.out.printf("%-13s | %,10d원 | %s | 재고: %d개%n",
-                p.getPdName(), p.getPdPrice(), p.getPdDescription(), p.getPdStock());
+        System.out.println(Format.productLine(p));
         System.out.println("위 정보로 상품을 추가하시겠습니까?\n1. 확인   2. 취소");
 
         int addConfirmChoice = sc.nextInt();
@@ -162,7 +159,7 @@ public class AdminService {
                             findProd.getPdName(), findProd.getPdStock(), newStock);
                     break;
                 default:
-                    System.out.println("올바른 숫자를 입력하세요!");
+                    System.out.println(Message.INVALID_NUMBER);
             }
         }
     }
@@ -185,9 +182,7 @@ public class AdminService {
         Product findProd = ref.product();
 
         System.out.println("[ 선택된 상품 ]");
-        System.out.printf("%-13s | %,10d원 | %s | 재고: %d개%n",
-                findProd.getPdName(), findProd.getPdPrice(),
-                findProd.getPdDescription(), findProd.getPdStock());
+        System.out.println(Format.productLine(findProd));
 
         System.out.println("1. 삭제(확정)");
         System.out.println("2. 메뉴로 돌아가기");
@@ -209,7 +204,7 @@ public class AdminService {
             }
             System.out.printf("%s 상품이 삭제 되었습니다.%n", findProd.getPdName());
         } else {
-            System.out.println("메뉴로 돌아갑니다.");
+            System.out.println(Message.GO_BACK);
         }
     }
 
