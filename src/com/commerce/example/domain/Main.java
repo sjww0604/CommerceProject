@@ -53,6 +53,7 @@ public class Main {
         pt.compareSearchPerformance();
         System.out.println("[Step 1 완료] 대용량 데이터 테스트 종료\n");
 
+        // 접두사 검색 및 반환 기능 구현
         com.commerce.example.PerformanceTest.runPrefixSearchFromCategories(categories);
     }
     /* 헬퍼 메서드 추가 */
