@@ -7,6 +7,7 @@ import com.commerce.example.service.SearchEngine;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Scanner;
 
 public class PerformanceTest {
 
@@ -94,36 +95,37 @@ public class PerformanceTest {
         long end = System.nanoTime();
         return end - start;
     }
-    public static void runFromCategories(List<Category> categories) {
+
+    public static void runPrefixSearchFromCategories(List<Category> categories) {
         List<Product> all = new ArrayList<>();
         for (Category c : categories) {
             all.addAll(c.getProducts());
         }
-        if (all.isEmpty()) {
-            System.out.println("[PerformanceTest] 카테고리에 상품이 없습니다.");
-            return;
-        }
-        // 타겟이 카테고리에 없으면 가운데 상품 이름을 타겟으로 사용
-        String target = TARGET;
-        boolean exists = false;
-        for (Product p : all) {
-            if (p.getPdName().equals(target)) {
-                exists = true;
-                break;
-            }
-        }
-        if (!exists) {
-            target = all.get(all.size() / 2).getPdName();
-        }
-        PerformanceTest pt = new PerformanceTest();
-        long linearTime = pt.measureLinearSearch(all, target);
-        long binaryTime = pt.measureBinarySearch(all, target);
-        System.out.println();
-        System.out.println("=== 카테고리 기반 성능 테스트 ===");
-        System.out.println("상품 수: " + fmt(all.size()) + "개, 검색어: \"" + target + "\"");
-        System.out.println("완전탐색: " + fmt(linearTime) + "ns, 비교횟수 " + lastLinearComparisons + "회, 결과: " + (lastLinearFound == null ? "없음" : "있음"));
-        System.out.println("이진탐색: " + fmt(binaryTime) + "ns, 비교횟수 " + lastBinaryComparisons + "회, 결과: " + (lastBinaryFound == null ? "없음" : "있음"));
-        double speedup = (binaryTime == 0) ? 0.0 : (double) linearTime / (double) binaryTime;
-        System.out.println("🚀 성능 향상: " + String.format("%.2f배", speedup));
+        runPrefixSearch(all);
     }
-}
+
+        public static void runPrefixSearch(List<Product> all) {
+            if ( all == null || all.isEmpty() ) {
+                System.out.println("[PrefixSearch] 상품 목록이 비어 있습니다.");
+                return;
+            }
+            Scanner sc = new Scanner(System.in);
+            System.out.print("검색할 상품명을 입력하세요: ");
+            String prefix = sc.nextLine().trim();
+
+            SearchEngine engine = new SearchEngine(all);
+            List<Product> hits = engine.searchByPrefix(prefix, Integer.MAX_VALUE);
+
+            System.out.println("\n[ " + prefix + "으로 시작하는 상품 ]");
+            if (hits.isEmpty()) {
+                System.out.println("검색 결과가 없습니다.");
+                return;
+            }
+            int idx = 1;
+            for (Product p : hits) {
+                System.out.printf("%2d. %s | %,d원 | 재고: %d%n",
+                        idx++, p.getPdName(), p.getPdPrice(), p.getPdStock());
+            }
+            System.out.println("\n총 " + hits.size() + "개 상품");
+        }
+    }

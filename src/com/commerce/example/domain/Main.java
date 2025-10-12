@@ -11,7 +11,9 @@ public class Main {
         // 전자제품
         Category electronics = createCategory("전자제품",
             new Product("Galaxy S25", 1200000, "최신 안드로이드 스마트폰", 3),
-            new Product("iPhone 16", 1350000, "Apple의 최신 스마트폰", 10),
+            new Product("iPhone 15", 1000000, "Apple의 23년식 최신 스마트폰", 10),
+            new Product("iPhone 16", 1200000, "Apple의 24년식 최신 스마트폰", 5),
+            new Product("iPhone 17", 1350000, "Apple의 25년식 최신 스마트폰", 3),
             new Product("MacBook Pro", 2400000, "M3 칩셋 노트북", 2),
             new Product("AirPods Pro", 350000, "노이즈 캔슬링 무선 이어폰", 5)
         );
@@ -51,6 +53,7 @@ public class Main {
         pt.compareSearchPerformance();
         System.out.println("[Step 1 완료] 대용량 데이터 테스트 종료\n");
 
+        com.commerce.example.PerformanceTest.runPrefixSearchFromCategories(categories);
     }
     /* 헬퍼 메서드 추가 */
     private static Category createCategory(String name, Product ... products) {

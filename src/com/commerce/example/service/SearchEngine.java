@@ -60,6 +60,25 @@ public class SearchEngine {
         return null; // 값을 찾지 못했을 때 null 값 반환
     }
 
+    // 접두사(prefix) 검색 및 반환
+    public List<Product> searchByPrefix(String prefix, int limit) {
+        List<Product> result = new ArrayList<>();
+        if (prefix == null || prefix.isEmpty()) return result;
+
+        // 미리 정렬된 상품 리스트 사용 (sortedProducts)
+        for (Product p : sortedProducts) {
+            String name = p.getPdName();
+            // 대소문자 무시하고 접두사 일치 검사
+            if (name.regionMatches(true, 0, prefix, 0, prefix.length())) {
+                result.add(p);
+                if (limit > 0 && result.size() >= limit) break;
+            }
+            // 정렬되어 있으므로 prefix보다 큰 문자열이 나오면 조기 종료
+            else if (name.compareToIgnoreCase(prefix) > 0) break;
+        }
+        return result;
+    }
+
     private int compareName(Product p, String targetName) {
         return p.getPdName().compareToIgnoreCase(targetName);
     }
