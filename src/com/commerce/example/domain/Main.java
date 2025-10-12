@@ -44,8 +44,13 @@ public class Main {
         List<Category> categories = Arrays.asList(electronics, clothes, foods, furniture);
         CommerceSystem system = new CommerceSystem(categories);
         system.start();
-        // === 성능 비교/검증: 기본 실행(대표 쿼리 자동 구성) ===
-        com.commerce.example.PerformanceTest.runFromCategories(categories);
+
+        // === 대용량 데이터 자동 생성 및 성능 테스트 ===
+        System.out.println("\n[Step 1] 대용량 데이터 테스트 시작");
+        com.commerce.example.PerformanceTest pt = new com.commerce.example.PerformanceTest();
+        pt.compareSearchPerformance();
+        System.out.println("[Step 1 완료] 대용량 데이터 테스트 종료\n");
+
     }
     /* 헬퍼 메서드 추가 */
     private static Category createCategory(String name, Product ... products) {
