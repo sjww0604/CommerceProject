@@ -37,8 +37,7 @@ public class SearchEngine {
 
         if (cmp == 0) return midProduct; // 값이 일치한 경우 상품명 그대로 반환
         else if (cmp > 0) return binarySearchRecursive(productName, left, mid - 1); //찾는 이름보다 mid의 값이 뒤에 있으므로 왼쪽 구간으로 탐색하도록 설정
-        else if (cmp < 0) return binarySearchRecursive(productName, mid + 1, right); // 찾는 이름보다 mid의 값이 앞에 있으므로 오른쪽 구간으로 탐색하도록 함
-        else return binarySearchRecursive(productName, mid +1, right);
+        else return binarySearchRecursive(productName, mid + 1, right);
     }
 
     // 이진탐색 - 반복문 방식
@@ -54,7 +53,7 @@ public class SearchEngine {
                 return midProduct;
             } else if (cmp > 0) {
                 right = mid - 1;
-            } else if (cmp < 0) {
+            } else {
                 left = mid + 1;
             }
         }

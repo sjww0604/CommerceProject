@@ -222,9 +222,5 @@ public class CommerceSystem {
         cartService.showCart();
     }
 
-    /* CartItem 클래스 생성 (병렬배열 제거 및 단일배열로 수정하기 위함)
-    * record 선언을 통해 getProduct -> item.Product 형식의 리팩토링 진행*/
-        record CartItem(Product product, int cartStock) {
-    }
 }
 
