@@ -19,6 +19,28 @@ public class SearchEngine {
         return new ArrayList<>(sortedProducts);
     }
 
+    // 이진탐색 - 재귀 방식
+
+    //외부에서 호출할 수 있는 메서드 선언 -> 이름으로만 값을 받아서 실질적인 계산은 내부 메서드가 처리하도록 함
+    public Product binarySearchRecursive(String productName) {
+        // 편의용 래퍼: 처음엔 left=0, right=끝
+        return binarySearchRecursive(productName, 0, sortedProducts.size() - 1);
+    }
+
+    public Product binarySearchRecursive(String productName, int left, int right) {
+        // 구현하세요
+        if (left > right) return null; // 탐색 조건이 만족되지 않는 경우 null 값 반환
+
+        int mid = left + (right - left) / 2;
+        Product midProduct = sortedProducts.get(mid); //중간 위치의 상품을 가져옴
+        int cmp = compareName(midProduct, productName); // 상품을 비교해서 같으면 0, mid의 값에 따라 양수 음수를 반환
+
+        if (cmp == 0) return midProduct; // 값이 일치한 경우 상품명 그대로 반환
+        else if (cmp > 0) return binarySearchRecursive(productName, left, mid - 1); //찾는 이름보다 mid의 값이 뒤에 있으므로 왼쪽 구간으로 탐색하도록 설정
+        else if (cmp < 0) return binarySearchRecursive(productName, mid + 1, right); // 찾는 이름보다 mid의 값이 앞에 있으므로 오른쪽 구간으로 탐색하도록 함
+        else return binarySearchRecursive(productName, mid +1, right);
+    }
+
     // 이진탐색 - 반복문 방식
     public Product binarySearchIterative(String productName) {
         // 구현하세요
