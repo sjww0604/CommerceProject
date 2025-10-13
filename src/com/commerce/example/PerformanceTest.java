@@ -61,7 +61,7 @@ public class PerformanceTest {
 
         // 입력값에 따른 검색 대상 지정 및 성능 시간 측정
         Scanner sc = new Scanner(System.in);
-        System.out.print("\n검색어를 입력하세요: ");
+        System.out.print("\n검색어를 입력하세요(예시 Product_1000): ");
         String input = sc.nextLine().trim();
 
         // 완전탐색 시간 측정
@@ -131,6 +131,7 @@ public class PerformanceTest {
     }
 
         public static void runPrefixSearch(List<Product> all) {
+            System.out.println("=== 상품 검색 시스템 ===");
             if ( all == null || all.isEmpty() ) {
                 System.out.println("[PrefixSearch] 상품 목록이 비어 있습니다.");
                 return;

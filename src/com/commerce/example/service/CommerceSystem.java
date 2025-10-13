@@ -15,6 +15,7 @@ import java.util.stream.IntStream;
 public class CommerceSystem {
     private final List<Category> categories = new ArrayList<>(); // 카테고리 필드 -> 카테고리 리스트 형태로 전환 및 통합
     private final CartService cartService = new CartService(); // 장바구니 기능 위임
+    private final CartHistory cartHistory = new CartHistory(); // 장바구니 변경이력 및 실행취소 기능 위임
     private final ProductService productService = new ProductService(categories);  // 조회,검증,수정,삭제 로직 위임
     private final Scanner sc = new Scanner(System.in); // 입력 담당
     private final AdminService adminService = new AdminService(sc, productService, cartService); // 관리자모드 입력 흐름 제어
@@ -187,6 +188,7 @@ public class CommerceSystem {
             System.out.println("0. 뒤로가기");
             System.out.print(Message.PROMPT_SELECT);
 
+
             // 개별 상품 선택 -> 장바구니 추가 확인
             int productChoice = sc.nextInt();
             sc.nextLine();
@@ -203,7 +205,9 @@ public class CommerceSystem {
                     "%s | %,d원 | %s | 재고: %d개",
                     selected.getPdName(), selected.getPdPrice(), selected.getPdDescription(), selected.getPdStock()
             );
+            System.out.println();
             System.out.println("선택한 상품: " + productResultList);
+            System.out.println();
             System.out.println("위 상품을 장바구니에 추가하시겠습니까?");
             System.out.printf("%-10s %-10s%n", "1.확인", "2. 취소");
             System.out.print(Message.PROMPT_SELECT);
@@ -219,7 +223,7 @@ public class CommerceSystem {
     }
     // 장바구니 출력 기능
     private void showCart() {
-        cartService.showCart();
+        cartService.showCartInteractive(categories, cartHistory, sc);
     }
 
 }
