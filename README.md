@@ -15,18 +15,20 @@ JAVA 문법 종합반 커머스 과제 레포지토리입니다.<br>
 **commerceProject**
 
 📂 src/com/commerce/example/
-│───── 📂 domain/       
+├───── 📂 domain/       
 │      ├── Main.java        // 시작 지점이 되는 클래스
 │      ├── Product.java     // 개별 상품 정보를 가지는 클래스
 │      ├── Category.java    // 상품 카테고리 관리 클래스
 │      ├── Customer.java    // 고객 정보 클래스
 │      └── CustomerRank.java // 고객 등급 Enum 클래스
-└───── 📂 service/      
-       ├── AdminService.java    // 관리자 모드 제어 (상품 CRUD 및 관리 기능)
-       ├── CartService.java     // 장바구니 담기/삭제/총액 계산 기능 담당
-       ├── CommerceSystem.java  // 프로그램 전체 흐름 및 주요 로직 제어
-       ├── OrderService.java    // 주문 처리 및 할인 정책 적용 담당
-       └── ProductService.java  // 상품 관련 검색, 수정, 삭제, 출력 기능 담당
+├───── 📂 service/      
+│      ├── AdminService.java    // 관리자 모드 제어 (상품 CRUD 및 관리 기능)
+│      ├── CartService.java     // 장바구니 담기/삭제/총액 계산 기능 담당
+│      ├── CommerceSystem.java  // 프로그램 전체 흐름 및 주요 로직 제어
+│      ├── OrderService.java    // 주문 처리 및 할인 정책 적용 담당
+│      └── ProductService.java  // 상품 관련 검색, 수정, 삭제, 출력 기능 담당
+│      └── SearchEngine.java    // 상품명 접두사 검색 기능 제공 (이진 탐색 기반) 
+└───── PerformanceTest.java     // 대용량 데이터 생성 및 탐색 알고리즘 성능 비교, 접두사 검색 성능 검증 클래스
 </pre>
 
 #### MVC 관점
@@ -41,6 +43,10 @@ JAVA 문법 종합반 커머스 과제 레포지토리입니다.<br>
 
 ## 도전기능
 - [x] 스스로 필요한 객체를 자유롭게 정의하고, 객체 간 협력 흐름을 설계해볼 것
-- [ ] Enum, 람다, 스트림을 적극  활용해 고객등급별 할인, 가격대 필터링, 장바구니 항목 제거/검색 등의 기능을 설계 구현해볼 것
+- [x] Enum, 람다, 스트림을 적극  활용해 고객등급별 할인, 가격대 필터링, 장바구니 항목 제거/검색 등의 기능을 설계 구현해볼 것
+
+### 📈 확장/테스트 기능
+- `SearchEngine` : 접두사 검색 로직 구현
+- `PerformanceTest` : 탐색 알고리즘 성능 비교 및 검증용 클래스
 
 
