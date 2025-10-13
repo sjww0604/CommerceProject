@@ -45,6 +45,30 @@ public class CartService {
         System.out.println(Format.addedToCart(product.getPdName(),1));
     }
 
+    // 장바구니에서 해당 상품 1개만 제거 (수량 1 감소, 0이면 항목 삭제)
+    public void removeOne(Product product) {
+        int foundIndex = -1;
+        for (int i = 0; i < cart.size(); i++) {
+            if (cart.get(i).product().equals(product)) {
+                foundIndex = i;
+                break;
+            }
+        }
+        if (foundIndex < 0) {
+            System.out.println("장바구니에 해당 상품이 없습니다: " + product.getPdName());
+            return;
+        }
+        CartItem item = cart.get(foundIndex);
+        int newQty = item.cartStock() - 1;
+        if (newQty > 0) {
+            cart.set(foundIndex, new CartItem(item.product(), newQty));
+        } else {
+            cart.remove(foundIndex);
+        }
+        System.out.println("장바구니에서 1개 제거: " + product.getPdName());
+    }
+
+
     // 장바구니 출력 기능
     public void showCart() {
         if (cart.isEmpty()) {
