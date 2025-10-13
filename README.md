@@ -16,25 +16,35 @@ JAVA 문법 종합반 커머스 과제 레포지토리입니다.<br>
 
 📂 src/com/commerce/example/
 ├───── 📂 domain/       
-│      ├── Main.java        // 시작 지점이 되는 클래스
-│      ├── Product.java     // 개별 상품 정보를 가지는 클래스
-│      ├── Category.java    // 상품 카테고리 관리 클래스
-│      ├── Customer.java    // 고객 정보 클래스
-│      └── CustomerRank.java // 고객 등급 Enum 클래스
+│      ├── Main.java            // 시작 지점이 되는 클래스
+│      ├── Product.java         // 개별 상품 정보를 가지는 클래스
+│      ├── Category.java        // 상품 카테고리 관리 클래스
+│      ├── Customer.java        // 고객 정보 클래스
+│      └── CustomerRank.java    // 고객 등급 Enum 클래스
 ├───── 📂 service/      
 │      ├── AdminService.java    // 관리자 모드 제어 (상품 CRUD 및 관리 기능)
-│      ├── CartService.java     // 장바구니 담기/삭제/총액 계산 기능 담당
+│      ├── CartAction.java      // 장바구니 내 개별 행동(추가/삭제)을 기록하는 데이터 클래스 (ActionType, Product, 수량, 타임스탬프 포함)
+│      ├── CartHistory.java     // 장바구니 상품 추가/삭제 이력 관리 및 Undo/Redo 기능 제공
+│      ├── CartService.java     // 장바구니 담기/삭제/총액 계산 및 CartHistory 연동 (히스토리 기반 되돌리기 기능 포함)
 │      ├── CommerceSystem.java  // 프로그램 전체 흐름 및 주요 로직 제어
 │      ├── OrderService.java    // 주문 처리 및 할인 정책 적용 담당
-│      └── ProductService.java  // 상품 관련 검색, 수정, 삭제, 출력 기능 담당
+│      ├── ProductService.java  // 상품 관련 검색, 수정, 삭제, 출력 기능 담당
 │      └── SearchEngine.java    // 상품명 접두사 검색 기능 제공 (이진 탐색 기반) 
-└───── PerformanceTest.java     // 대용량 데이터 생성 및 탐색 알고리즘 성능 비교, 접두사 검색 성능 검증 클래스
+└───── PerformanceTest.java     // 대용량 랜덤 상품 데이터 생성 및 탐색 알고리즘(완전탐색 vs 이진탐색) 성능 비교, 접두사 검색 검증
 </pre>
 
 #### MVC 관점
-- Model → Product, Category, Customer, CustomerRank
-- Service/Logic → ProductService, CartService, OrderService, AdminService
-- Controller → CommerceSystem, Main
+- **Model**
+    - `Product`, `Category`, `Customer`, `CustomerRank`
+    - `CartAction` (장바구니에서 발생한 개별 행위 데이터: ADD/REMOVE, 수량, 타임스탬프)
+- **Service / Logic**
+    - `ProductService`, `CartService`, `OrderService`, `AdminService`
+    - `CartHistory` (장바구니 이력 관리 + Undo/Redo 스택 로직)
+    - `SearchEngine` (상품명 접두사 기반 검색 로직, 정렬 + 이진 탐색)
+- **Controller (Console App)**
+    - `CommerceSystem` (메뉴 라우팅/흐름 제어, 서비스 호출)
+    - `Main` (프로그램 엔트리 포인트)
+    - ※ 콘솔 출력/입력(View 역할)은 `CommerceSystem`과 일부 `CartService.showCartInteractive` 내에서 수행
 
 ## 필수기능
 - [x] 기초적인 흐름 제어 및 객체 지향 설계 개념 복습 
@@ -46,7 +56,11 @@ JAVA 문법 종합반 커머스 과제 레포지토리입니다.<br>
 - [x] Enum, 람다, 스트림을 적극  활용해 고객등급별 할인, 가격대 필터링, 장바구니 항목 제거/검색 등의 기능을 설계 구현해볼 것
 
 ### 📈 확장/테스트 기능
-- `SearchEngine` : 접두사 검색 로직 구현
-- `PerformanceTest` : 탐색 알고리즘 성능 비교 및 검증용 클래스
+- `SearchEngine` : 접두사 검색 로직 구현 (정렬 + 이진 탐색 기반)
+- `PerformanceTest` : 대용량 랜덤 데이터 생성, 선형/이진 탐색 성능 비교 및 검증
+- `CartAction` + `CartHistory` : 장바구니 이력 기록, Undo/Redo 스택 로직 처리
 
-
+## 🧩 실행 방법
+1. `Main.java` 실행
+2. 콘솔에서 메뉴를 선택하여 상품 검색 / 장바구니 담기 / Undo-Redo 기능 테스트
+3. `PerformanceTest` 실행 시, 대용량 데이터 기반 탐색 성능 비교 결과 출력
