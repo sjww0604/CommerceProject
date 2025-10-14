@@ -98,13 +98,6 @@ public class CartService {
             System.out.println();
             showCart(); // 기존 출력 활용
 
-            CartAction nextUndo = cartHistory.peekUndo();
-            CartAction nextRedo = cartHistory.peekRedo();
-            String undoHint = (nextUndo == null) ? "없음" : nextUndo.getType() + " " +
-                    nextUndo.getProduct().getPdName() + " x" + nextUndo.getQuantity();
-            String redoHint = (nextRedo == null) ? "없음" : nextRedo.getType() + " " +
-                    nextRedo.getProduct().getPdName() + " x" + nextRedo.getQuantity();
-
             System.out.println();
             System.out.println(String.format("1. %s | 2. %s | 3. %s (⌘+Z) | 4. %s (⌘+Y)",
                     "상품 추가", "상품 삭제", "Undo", "Redo"));

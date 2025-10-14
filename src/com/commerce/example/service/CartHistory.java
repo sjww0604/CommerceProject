@@ -3,8 +3,8 @@ package com.commerce.example.service;
 import java.util.Stack;
 
 public class CartHistory {
-    private Stack<CartAction> undoStack = new Stack<>();
-    private Stack<CartAction> redoStack = new Stack<>();
+    private final Stack<CartAction> undoStack = new Stack<>();
+    private final Stack<CartAction> redoStack = new Stack<>();
 
     public void addAction(CartAction action) {
         undoStack.push(action);
